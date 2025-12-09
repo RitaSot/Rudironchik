@@ -120,6 +120,121 @@
     <script src="js/components/Footer.js" type="text/babel"></script>
     <script src="js/app.js" type="text/babel"></script>
 
+    <!-- Тестирование API -->
+    <script src="js/test-api.js"></script>
+
+    <!-- Автоматическая проверка API при загрузке -->
+    <script>
+        // Проверка подключения к API при загрузке страницы
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('Проверка подключения к API...');
+
+            try {
+                // Пробуем подключиться к API
+                const response = await fetch('http://127.0.0.1:8000/telemetry', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ API доступен! Данные:', data);
+
+                    // Показать уведомление о успешном подключении
+                    const notification = document.createElement('div');
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #28a745;
+                        color: white;
+                        padding: 12px 18px;
+                        border-radius: 8px;
+                        z-index: 10000;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                        font-family: 'Segoe UI', sans-serif;
+                        animation: slideIn 0.3s ease;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    `;
+                    notification.innerHTML = `
+                        <span style="font-size: 1.2em;">📡</span>
+                        <div>
+                            <strong style="display: block; margin-bottom: 4px;">API подключен</strong>
+                            <span style="font-size: 0.9em; opacity: 0.9;">Используются реальные данные</span>
+                        </div>
+                    `;
+                    document.body.appendChild(notification);
+
+                    // Автоматически скрыть через 5 секунд
+                    setTimeout(() => {
+                        notification.style.animation = 'slideOut 0.3s ease';
+                        setTimeout(() => notification.remove(), 300);
+                    }, 5000);
+
+                } else {
+                    console.warn('⚠️ API недоступен. Статус:', response.status);
+                    showApiWarning(`API недоступен (статус: ${response.status})`);
+                }
+            } catch (error) {
+                console.warn('❌ Ошибка подключения к API:', error.message);
+                showApiWarning(`Ошибка подключения: ${error.message}`);
+            }
+
+            function showApiWarning(message) {
+                const warning = document.createElement('div');
+                warning.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #ffc107;
+                    color: #856404;
+                    padding: 12px 18px;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    font-family: 'Segoe UI', sans-serif;
+                    animation: slideIn 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    border: 1px solid #ffeaa7;
+                `;
+                warning.innerHTML = `
+                    <span style="font-size: 1.2em;">⚠️</span>
+                    <div>
+                        <strong style="display: block; margin-bottom: 4px;">API недоступен</strong>
+                        <span style="font-size: 0.9em;">${message}<br>Используются демо-данные</span>
+                    </div>
+                `;
+                document.body.appendChild(warning);
+
+                // Автоматически скрыть через 8 секунд
+                setTimeout(() => {
+                    warning.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => warning.remove(), 300);
+                }, 8000);
+            }
+
+            // Добавить CSS анимации
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+
     <!-- Дополнительные стили -->
     <style>
         /* Индикатор загрузки */

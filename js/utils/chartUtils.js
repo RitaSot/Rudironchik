@@ -56,19 +56,19 @@ const ChartUtils = {
 
     generateMockData(region, days, type) {
         const regionProfiles = {
-            'moscow': {
+            'Москва': { // Было 'moscow'
                 temperature: { base: 18, range: 15, trend: 0.1, seasonal: 0.3 },
                 humidity: { base: 65, range: 20, trend: -0.05, seasonal: 0.2 },
                 pressure: { base: 1013, range: 10, trend: 0.02, seasonal: 0.1 },
                 insolation: { base: 5000, range: 3000, trend: 0.15, seasonal: 0.4 }
             },
-            'saint-petersburg': {
+            'Санкт-Петербург': { // Было 'saint-petersburg'
                 temperature: { base: 15, range: 12, trend: 0.08, seasonal: 0.25 },
                 humidity: { base: 75, range: 15, trend: -0.03, seasonal: 0.15 },
                 pressure: { base: 1010, range: 12, trend: 0.01, seasonal: 0.08 },
                 insolation: { base: 3500, range: 2500, trend: 0.12, seasonal: 0.35 }
             },
-            'krasnodar': {
+            'Краснодарский край': { // Было 'krasnodar'
                 temperature: { base: 22, range: 10, trend: 0.12, seasonal: 0.35 },
                 humidity: { base: 60, range: 25, trend: -0.08, seasonal: 0.25 },
                 pressure: { base: 1015, range: 8, trend: 0.03, seasonal: 0.12 },
@@ -76,7 +76,7 @@ const ChartUtils = {
             }
         };
 
-        const profile = regionProfiles[region] || regionProfiles['moscow'];
+        const profile = regionProfiles[region] || regionProfiles['Москва'];
         const config = profile[type] || profile.temperature;
         const data = [];
 

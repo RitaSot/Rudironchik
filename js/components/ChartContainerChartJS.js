@@ -2,47 +2,46 @@ const ChartContainerChartJS = () => {
     const [currentChartIndex, setCurrentChartIndex] = React.useState(0);
     const [chartData, setChartData] = React.useState({});
     const [loading, setLoading] = React.useState(false);
+    const [error, setError] = React.useState(null);
+    const [dataSource, setDataSource] = React.useState('demo');
     const chartRefs = React.useRef([]);
 
-    // Состояния для фильтров (как в оригинале)
     const [filters, setFilters] = React.useState({
         startDate: DateUtils.getStartOfMonth(new Date()),
         endDate: new Date(),
-        region: 'moscow'
+        region: 'Москва'
     });
 
-    // Регионы (как в оригинале)
     const availableRegions = React.useMemo(() => [
-        { value: 'moscow', label: 'Москва' },
-        { value: 'saint-petersburg', label: 'Санкт-Петербург' },
-        { value: 'sevastopol', label: 'Севастополь' },
-        { value: 'adygea', label: 'Республика Адыгея (Адыгея)' },
-        { value: 'bashkortostan', label: 'Республика Башкортостан' },
-        { value: 'buryatia', label: 'Республика Бурятия' },
-        { value: 'altai-republic', label: 'Республика Алтай' },
-        { value: 'dagestan', label: 'Республика Дагестан' },
-        { value: 'ingushetia', label: 'Республика Ингушетия' },
-        { value: 'kabardino-balkaria', label: 'Кабардино-Балкарская Республика' },
-        { value: 'kalmykia', label: 'Республика Калмыкия' },
-        { value: 'karachay-cherkessia', label: 'Карачаево-Черкесская Республика' },
-        { value: 'karelia', label: 'Республика Карелия' },
-        { value: 'komi', label: 'Республика Коми' },
-        { value: 'mari-el', label: 'Республика Марий Эл' },
-        { value: 'mordovia', label: 'Республика Мордовия' },
-        { value: 'sakha', label: 'Республика Саха (Якутия)' },
-        { value: 'north-ossetia', label: 'Республика Северная Осетия - Алания' },
-        { value: 'tatarstan', label: 'Республика Татарстан (Татарстан)' },
-        { value: 'tuva', label: 'Республика Тыва' },
-        { value: 'udmurtia', label: 'Удмуртская Республика' },
-        { value: 'khakassia', label: 'Республика Хакасия' },
-        { value: 'chechnya', label: 'Чеченская Республика' },
-        { value: 'chuvashia', label: 'Чувашская Республика - Чувашия' },
-        { value: 'altai-krai', label: 'Алтайский край' },
-        { value: 'krasnodar', label: 'Краснодарский край' },
-        { value: 'krasnoyarsk', label: 'Красноярский край' }
+        { value: 'Москва', label: 'Москва' },
+        { value: 'Санкт-Петербург', label: 'Санкт-Петербург' },
+        { value: 'Севастополь', label: 'Севастополь' },
+        { value: 'Республика Адыгея (Адыгея)', label: 'Республика Адыгея (Адыгея)' },
+        { value: 'Республика Башкортостан', label: 'Республика Башкортостан' },
+        { value: 'Республика Бурятия', label: 'Республика Бурятия' },
+        { value: 'Республика Алтай', label: 'Республика Алтай' },
+        { value: 'Республика Дагестан', label: 'Республика Дагестан' },
+        { value: 'Республика Ингушетия', label: 'Республика Ингушетия' },
+        { value: 'Кабардино-Балкарская Республика', label: 'Кабардино-Балкарская Республика' },
+        { value: 'Республика Калмыкия', label: 'Республика Калмыкия' },
+        { value: 'Карачаево-Черкесская Республика', label: 'Карачаево-Черкесская Республика' },
+        { value: 'Республика Карелия', label: 'Республика Карелия' },
+        { value: 'Республика Коми', label: 'Республика Коми' },
+        { value: 'Республика Марий Эл', label: 'Республика Марий Эл' },
+        { value: 'Республика Мордовия', label: 'Республика Мордовия' },
+        { value: 'Республика Саха (Якутия)', label: 'Республика Саха (Якутия)' },
+        { value: 'Республика Северная Осетия - Алания', label: 'Республика Северная Осетия - Алания' },
+        { value: 'Республика Татарстан (Татарстан)', label: 'Республика Татарстан (Татарстан)' },
+        { value: 'Республика Тыва', label: 'Республика Тыва' },
+        { value: 'Удмуртская Республика', label: 'Удмуртская Республика' },
+        { value: 'Республика Хакасия', label: 'Республика Хакасия' },
+        { value: 'Чеченская Республика', label: 'Чеченская Республика' },
+        { value: 'Чувашская Республика - Чувашия', label: 'Чувашская Республика - Чувашия' },
+        { value: 'Алтайский край', label: 'Алтайский край' },
+        { value: 'Краснодарский край', label: 'Краснодарский край' },
+        { value: 'Красноярский край', label: 'Красноярский край' }
     ], []);
 
-    // Типы графиков с цветами
     const chartTypes = [
         {
             id: 'temperature',
@@ -70,47 +69,46 @@ const ChartContainerChartJS = () => {
         }
     ];
 
-    // Загрузка данных при изменении фильтров
     React.useEffect(() => {
         loadChartData();
     }, [filters]);
 
-    // Загрузка данных
     const loadChartData = React.useCallback(async () => {
         setLoading(true);
+        setError(null);
+
         try {
-            // Пока используем мок-данные
-            const daysDiff = DateUtils.getDaysDiff(filters.startDate, filters.endDate);
-            const data = {
-                temperature: ChartUtils.generateMockData(filters.region, daysDiff, 'temperature'),
-                humidity: ChartUtils.generateMockData(filters.region, daysDiff, 'humidity'),
-                pressure: ChartUtils.generateMockData(filters.region, daysDiff, 'pressure'),
-                insolation: ChartUtils.generateMockData(filters.region, daysDiff, 'insolation')
-            };
+            const data = await DataService.getChartData(filters);
             setChartData(data);
+            setDataSource(data.metadata?.source || 'demo');
+
+            if (data.metadata?.source === 'api' && data.metadata?.apiData) {
+                console.log('Данные от API:', data.metadata.apiData);
+            }
         } catch (error) {
             console.error('Ошибка загрузки данных:', error);
-            // Fallback на простые данные
+            setError('Не удалось загрузить данные. Используются демо-данные.');
+
             const daysDiff = DateUtils.getDaysDiff(filters.startDate, filters.endDate);
             setChartData({
                 temperature: Array(daysDiff).fill().map(() => 20 + Math.random() * 10),
                 humidity: Array(daysDiff).fill().map(() => 60 + Math.random() * 20),
                 pressure: Array(daysDiff).fill().map(() => 1010 + Math.random() * 10),
-                insolation: Array(daysDiff).fill().map(() => 5000 + Math.random() * 3000)
+                insolation: Array(daysDiff).fill().map(() => 5000 + Math.random() * 3000),
+                metadata: { source: 'fallback' }
             });
+            setDataSource('fallback');
         } finally {
             setTimeout(() => setLoading(false), 500);
         }
     }, [filters]);
 
-    // Создание графика
     React.useEffect(() => {
         if (!loading && chartRefs.current[currentChartIndex]) {
             renderChart();
         }
     }, [currentChartIndex, loading, chartData]);
 
-    // Функция рендера графика
     const renderChart = () => {
         const canvas = chartRefs.current[currentChartIndex];
         if (!canvas) return;
@@ -119,20 +117,16 @@ const ChartContainerChartJS = () => {
         const chartType = chartTypes[currentChartIndex];
         const data = chartData[chartType.id] || [];
 
-        // Подписи по оси X (используем существующую функцию)
         const labels = DateUtils.getChartLabels(filters.startDate, filters.endDate);
 
-        // Удаляем старый график если есть
         if (canvas.chart) {
             canvas.chart.destroy();
         }
 
-        // Создаем градиент
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
         gradient.addColorStop(0, chartType.gradient[0] + '80');
         gradient.addColorStop(1, chartType.gradient[1] + '20');
 
-        // Создаем новый график
         canvas.chart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -222,8 +216,6 @@ const ChartContainerChartJS = () => {
         });
     };
 
-    // ---------- ОБРАБОТЧИКИ ФИЛЬТРОВ (как в оригинале) ----------
-
     const handleStartDateChange = React.useCallback((e) => {
         const newDate = new Date(e.target.value);
         if (DateUtils.isValidDateRange(newDate, filters.endDate)) {
@@ -242,14 +234,12 @@ const ChartContainerChartJS = () => {
         setFilters(prev => ({ ...prev, region: e.target.value }));
     }, []);
 
-    // Быстрые фильтры по датам
     const setDateRange = React.useCallback((days) => {
         const end = new Date();
         const start = DateUtils.addDays(end, -days + 1);
         setFilters(prev => ({ ...prev, startDate: start, endDate: end }));
     }, []);
 
-    // Навигация по графикам
     const nextChart = React.useCallback(() => {
         setCurrentChartIndex(prev => (prev + 1) % chartTypes.length);
     }, [chartTypes.length]);
@@ -262,15 +252,35 @@ const ChartContainerChartJS = () => {
         setCurrentChartIndex(index);
     }, []);
 
+    const toggleApiMode = React.useCallback(() => {
+        const newMode = !DataService.USE_REAL_API;
+        DataService.setApiMode(newMode);
+        loadChartData();
+    }, [loadChartData]);
+
     return DomUtils.createElement('div', { className: 'charts-chartjs fade-in' },
-        // Заголовок БЕЗ смайлика
         DomUtils.createElement('h2', { className: 'section-title' },
             'Мониторинг экологических показателей'
         ),
 
-        // ---------- ФИЛЬТРЫ (как в оригинале) ----------
+        // Панель управления API (только переключение режима)
+        DomUtils.createElement('div', { className: 'api-controls' },
+            DomUtils.createElement('button', {
+                className: `api-btn ${DataService.USE_REAL_API ? 'api-btn--active' : ''}`,
+                onClick: toggleApiMode,
+                disabled: loading
+            }, DataService.USE_REAL_API ? '📡 API режим' : '🔄 Демо режим'),
+
+            error && DomUtils.createElement('div', { className: 'api-error' },
+                '⚠️ ' + error
+            ),
+
+            DomUtils.createElement('div', { className: 'data-source-info' },
+                `Источник данных: ${dataSource === 'api' ? '📡 API' : dataSource === 'demo' ? '🔄 Демо' : '⚠️ Резерв'}`
+            )
+        ),
+
         DomUtils.createElement('div', { className: 'filters' },
-            // Быстрые фильтры
             DomUtils.createElement('div', { className: 'filters__quick' },
                 DomUtils.createElement('button', {
                     className: 'filters__quick-btn',
@@ -286,7 +296,6 @@ const ChartContainerChartJS = () => {
                 }, 'Квартал')
             ),
 
-            // Основные фильтры
             DomUtils.createElement('div', { className: 'filters__main' },
                 DomUtils.createElement('div', { className: 'filters__group' },
                     DomUtils.createElement('label', {
@@ -339,13 +348,11 @@ const ChartContainerChartJS = () => {
                 )
             ),
 
-            // Информация
             DomUtils.createElement('div', { className: 'filters__info' },
                 `Данные с ${DateUtils.formatDisplayDate(filters.startDate)} по ${DateUtils.formatDisplayDate(filters.endDate)} | Регион: ${availableRegions.find(r => r.value === filters.region)?.label || filters.region}`
             )
         ),
 
-        // ---------- УПРАВЛЕНИЕ ГРАФИКАМИ ----------
         DomUtils.createElement('div', { className: 'charts__controls' },
             DomUtils.createElement('button', {
                 className: 'charts__nav-btn',
@@ -364,7 +371,6 @@ const ChartContainerChartJS = () => {
             }, '›')
         ),
 
-        // ---------- КОНТЕЙНЕР ДЛЯ ГРАФИКА ----------
         DomUtils.createElement('div', { className: 'chartjs-container' },
             loading ?
                 DomUtils.createElement('div', { className: 'charts__loading' },
@@ -377,7 +383,6 @@ const ChartContainerChartJS = () => {
                 })
         ),
 
-        // ---------- ИНДИКАТОРЫ ГРАФИКОВ ----------
         DomUtils.createElement('div', { className: 'charts__indicators' },
             chartTypes.map((_, index) =>
                 DomUtils.createElement('button', {
