@@ -1,0 +1,58 @@
+:root {
+    /* Colors */
+    --primary: #1a1a1a;
+    --secondary: #45AEAC;
+    --accent: #B0FAB4;
+    --white: #ffffff;
+    --gray-100: #f8f9fa;
+    --gray-200: rgba(255, 255, 255, 0.7);
+    --gray-300: rgba(255, 255, 255, 0.5);
+    --gray-400: rgba(0, 0, 0, 0.1);
+    --gray-500: rgba(0, 0, 0, 0.3);
+    --gray-600: #666;
+
+    /* Background gradient */
+    --bg-gradient: linear-gradient(135deg, var(--secondary), var(--accent));
+
+    /* Typography */
+    --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+
+    /* Spacing */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-8: 3rem;
+
+    /* Border radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 1rem;
+    --radius-lg: 1.25rem;
+    --radius-xl: 1.5rem;
+
+    /* Shadows */
+    --shadow-sm: 0 0.125rem 0.625rem var(--gray-400);
+    --shadow-md: 0 0.3125rem 0.9375rem var(--gray-400);
+    --shadow-lg: 0 0.5rem 2rem rgba(0, 0, 0, 0.1);
+
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+
+    /* Z-index */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal: 1040;
+    --z-popover: 1050;
+    --z-tooltip: 1060;
+}

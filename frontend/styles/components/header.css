@@ -1,0 +1,55 @@
+/* Header */
+.header {
+    text-align: center;
+    padding: var(--space-8) 0;
+    background: transparent; /* Делаем прозрачным */
+    color: var(--primary);
+    position: relative;
+}
+
+/* Добавляем псевдоэлемент для градиента, чтобы он был одинаковым с body */
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-gradient);
+    z-index: -1;
+}
+
+.header__title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-5);
+    text-shadow: 1px 1px 3px var(--gray-400);
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.header__subtitle {
+    font-size: var(--text-lg);
+    max-width: 50rem;
+    margin: 0 auto;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+/* Section titles */
+.section-title {
+    text-align: center;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    display: block;
+    width: 4rem;
+    height: 0.25rem;
+    background: var(--primary);
+    margin: var(--space-5) auto;
+    border-radius: 0.125rem;
+}

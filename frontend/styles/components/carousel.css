@@ -1,0 +1,117 @@
+/* Carousel */
+.carousel {
+    margin: var(--space-8) 0;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    position: relative;
+}
+
+.carousel__track {
+    display: flex;
+    transition: transform var(--transition-slow);
+    width: 100%;
+}
+
+.carousel__item {
+    flex: 0 0 100%;
+    background: var(--gray-200);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    min-height: 22rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 var(--space-3);
+    box-shadow: var(--shadow-md);
+}
+
+.carousel__photo {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: var(--space-5);
+    border: 0.25rem solid var(--white);
+    box-shadow: var(--shadow-lg);
+}
+
+.carousel__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-base);
+}
+
+.carousel__item:hover .carousel__image {
+    transform: scale(1.05);
+}
+
+.carousel__name {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-3);
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.carousel__role {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+.carousel__btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--gray-500);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-sticky);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-md);
+}
+
+.carousel__btn:hover {
+    background: var(--primary);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel__btn--prev {
+    left: var(--space-3);
+}
+
+.carousel__btn--next {
+    right: var(--space-3);
+}
+
+.carousel__indicators {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+}
+
+.carousel__indicator {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--gray-500);
+    transition: all var(--transition-base);
+    border: 2px solid transparent;
+}
+
+.carousel__indicator--active {
+    background: var(--primary);
+    transform: scale(1.2);
+}

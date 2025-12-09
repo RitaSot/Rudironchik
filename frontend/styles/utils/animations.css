@@ -1,0 +1,90 @@
+/* Chart animations */
+.chart-line-animation {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawLine 1.2s var(--transition-base) forwards;
+}
+
+.chart-area-animation {
+    opacity: 0;
+    animation: fadeInArea 1.5s var(--transition-base) 0.3s forwards;
+}
+
+.chart-point-animation {
+    opacity: 0;
+    animation: fadeInScale 0.6s var(--transition-base) 0.8s forwards;
+}
+
+@keyframes drawLine {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes fadeInArea {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Loading animations */
+.loading-spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 3px solid var(--gray-400);
+    border-top: 3px solid var(--secondary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Fade animations */
+.fade-in {
+    animation: fadeIn var(--transition-base);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slide animations */
+.slide-in-left {
+    animation: slideInLeft var(--transition-base);
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

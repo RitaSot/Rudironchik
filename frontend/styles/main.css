@@ -1,0 +1,201 @@
+/* Import utilities */
+@import 'utils/reset.css';
+@import 'utils/variables.css';
+@import 'utils/animations.css';
+
+/* Import components */
+@import 'components/header.css';
+@import 'components/filters.css';
+@import 'components/charts.css';
+@import 'components/carousel.css';
+
+/* Global background */
+html, body {
+    min-height: 100vh;
+    background: var(--bg-gradient);
+    background-attachment: fixed; /* Фиксируем градиент */
+}
+
+/* Main layout */
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: transparent; /* Убираем фон у app, т.к. он уже в body */
+    color: var(--primary);
+}
+
+.app__main {
+    flex: 1;
+    padding: var(--space-6) 0;
+    background: transparent;
+}
+
+.container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-5);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn--primary {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.btn--primary:hover {
+    background: #333;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn--secondary {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.btn--secondary:hover {
+    background: var(--primary);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn--full {
+    width: 100%;
+    padding: var(--space-5) 0;
+    border-radius: var(--radius-xl);
+    font-size: var(--text-lg);
+}
+
+/* Footer */
+.footer {
+    background: var(--primary);
+    color: var(--gray-300);
+    padding: var(--space-6) 0;
+    text-align: center;
+    margin-top: auto;
+}
+
+.footer__text {
+    font-size: var(--text-sm);
+    opacity: 0.8;
+}
+
+/* Divider */
+.divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gray-500), transparent);
+    margin: var(--space-8) 0;
+}
+
+/* Utility classes */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-4 {
+    margin-bottom: var(--space-4);
+}
+
+.mb-6 {
+    margin-bottom: var(--space-6);
+}
+
+/* Image fallback styles */
+.image-fallback {
+    width: 100%;
+    height: 100%;
+    background: var(--gray-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+    border-radius: inherit;
+}
+
+/* Responsive design */
+@media (max-width: 48rem) {
+    .container {
+        padding: 0 var(--space-3);
+    }
+
+    .charts {
+        padding: var(--space-4);
+    }
+
+    .filters__main {
+        grid-template-columns: 1fr;
+    }
+
+    .filters__quick {
+        flex-direction: column;
+    }
+
+    .carousel__item {
+        min-height: 20rem;
+        padding: var(--space-4);
+    }
+}
+
+@media (min-width: 48rem) {
+    .carousel__track {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-4);
+        transform: none !important;
+    }
+
+    .carousel__item {
+        flex: none;
+        margin: 0;
+    }
+
+    .carousel__btn,
+    .carousel__indicators {
+        display: none;
+    }
+
+    .filters__main {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 64rem) {
+    .charts__wrapper {
+        min-height: 30rem;
+    }
+
+    .charts__line {
+        padding: var(--space-6);
+    }
+}
