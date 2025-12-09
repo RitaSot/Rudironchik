@@ -1,4 +1,4 @@
-/* Carousel */
+/* ==================== ОСНОВНОЙ КОНТЕЙНЕР ==================== */
 .carousel {
     margin: var(--space-8) 0;
     border-radius: var(--radius-xl);
@@ -12,13 +12,13 @@
     width: 100%;
 }
 
+/* ==================== КАРТОЧКИ УЧАСТНИКОВ ==================== */
 .carousel__item {
     flex: 0 0 100%;
-    background: var(--gray-200);
+    background: #ffffff;
     border-radius: var(--radius-xl);
     padding: var(--space-6);
     text-align: center;
-    backdrop-filter: blur(10px);
     min-height: 22rem;
     display: flex;
     flex-direction: column;
@@ -26,16 +26,27 @@
     justify-content: center;
     margin: 0 var(--space-3);
     box-shadow: var(--shadow-md);
+    border: 1px solid #dee2e6;
+    transition: all var(--transition-base);
+    animation: slideInLeft var(--transition-base);
 }
 
+.carousel__item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ==================== ФОТОГРАФИИ ==================== */
 .carousel__photo {
     width: 8rem;
     height: 8rem;
     border-radius: 50%;
     overflow: hidden;
     margin-bottom: var(--space-5);
-    border: 0.25rem solid var(--white);
+    border: 0.25rem solid #ffffff;
     box-shadow: var(--shadow-lg);
+    background: #f8f9fa;
+    position: relative;
 }
 
 .carousel__image {
@@ -49,6 +60,7 @@
     transform: scale(1.05);
 }
 
+/* ==================== ТЕКСТОВОЕ СОДЕРЖАНИЕ ==================== */
 .carousel__name {
     font-size: var(--text-lg);
     margin-bottom: var(--space-3);
@@ -58,11 +70,13 @@
 
 .carousel__role {
     font-size: var(--text-sm);
-    color: var(--gray-600);
+    color: #6c757d;
     line-height: 1.5;
     font-weight: 400;
+    max-width: 20rem;
 }
 
+/* ==================== НАВИГАЦИЯ (МОБИЛЬНАЯ) ==================== */
 .carousel__btn {
     position: absolute;
     top: 50%;
@@ -70,8 +84,8 @@
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
-    background: var(--gray-500);
-    color: var(--white);
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -80,11 +94,14 @@
     font-weight: 600;
     transition: all var(--transition-base);
     box-shadow: var(--shadow-md);
+    border: 2px solid #ffffff;
+    cursor: pointer;
 }
 
 .carousel__btn:hover {
-    background: var(--primary);
+    background: var(--secondary);
     transform: translateY(-50%) scale(1.1);
+    box-shadow: var(--shadow-lg);
 }
 
 .carousel__btn--prev {
@@ -95,6 +112,7 @@
     right: var(--space-3);
 }
 
+/* ==================== ИНДИКАТОРЫ ==================== */
 .carousel__indicators {
     display: flex;
     justify-content: center;
@@ -106,12 +124,184 @@
     width: 0.5rem;
     height: 0.5rem;
     border-radius: 50%;
-    background: var(--gray-500);
+    background: #adb5bd;
     transition: all var(--transition-base);
-    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.carousel__indicator:hover {
+    background: #6c757d;
+    transform: scale(1.2);
 }
 
 .carousel__indicator--active {
-    background: var(--primary);
+    background: var(--secondary);
     transform: scale(1.2);
+}
+
+/* ==================== FALLBACK ИЗОБРАЖЕНИЙ ==================== */
+.image-fallback {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e9ecef, #dee2e6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    border-radius: inherit;
+}
+
+/* ==================== ДЕСКТОПНАЯ ВЕРСИЯ ==================== */
+@media (min-width: 48rem) {
+    .carousel__track {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-4);
+        transform: none !important;
+    }
+
+    .carousel__item {
+        flex: none;
+        margin: 0;
+        min-height: 25rem;
+    }
+
+    .carousel__photo {
+        width: 10rem;
+        height: 10rem;
+    }
+
+    .carousel__name {
+        font-size: var(--text-xl);
+    }
+
+    .carousel__role {
+        font-size: var(--text-base);
+    }
+
+    .carousel__btn,
+    .carousel__indicators {
+        display: none;
+    }
+}
+
+/* ==================== АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ ==================== */
+@media (max-width: 768px) {
+    .carousel__item {
+        min-height: 20rem;
+        padding: var(--space-4);
+        margin: 0 var(--space-2);
+    }
+
+    .carousel__photo {
+        width: 6rem;
+        height: 6rem;
+        margin-bottom: var(--space-4);
+    }
+
+    .carousel__name {
+        font-size: var(--text-base);
+    }
+
+    .carousel__role {
+        font-size: var(--text-sm);
+    }
+
+    .carousel__btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: var(--text-base);
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel__item {
+        min-height: 18rem;
+        padding: var(--space-3);
+    }
+
+    .carousel__photo {
+        width: 5rem;
+        height: 5rem;
+        border-width: 0.2rem;
+    }
+
+    .carousel__name {
+        font-size: var(--text-sm);
+        margin-bottom: var(--space-2);
+    }
+
+    .carousel__role {
+        font-size: var(--text-xs);
+    }
+}
+
+/* ==================== АНИМАЦИИ ==================== */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.carousel__photo.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+/* ==================== ДОСТУПНОСТЬ ==================== */
+.carousel__btn:focus-visible,
+.carousel__indicator:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+}
+
+.carousel__btn:disabled,
+.carousel__indicator:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.carousel__btn:disabled:hover {
+    background: rgba(0, 0, 0, 0.3);
+    transform: translateY(-50%) !important;
+}
+
+/* ==================== ПЕЧАТЬ ==================== */
+@media print {
+    .carousel {
+        break-inside: avoid;
+    }
+
+    .carousel__item {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        background: white !important;
+        min-height: auto;
+        margin: 0;
+    }
+
+    .carousel__btn,
+    .carousel__indicators {
+        display: none !important;
+    }
+
+    .carousel__track {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: var(--space-4) !important;
+        transform: none !important;
+    }
 }

@@ -1,224 +1,134 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light" style="color-scheme: light;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Система мониторинга экологической обстановки - проект команды Рудирончики">
     <meta name="keywords" content="экология, мониторинг, температура, влажность, давление, освещенность, графики">
+
+    <!-- Метатеги темы -->
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#45AEAC">
+    <meta name="supported-color-schemes" content="light">
+
     <title>Экологический мониторинг - Станция мониторинга | Рудирончики</title>
 
-    <!-- Preload critical resources -->
+    <!-- Предзагрузка ресурсов -->
     <link rel="preload" href="styles/main.css" as="style">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script" crossorigin="anonymous">
-    <link rel="preload" href="https://unpkg.com/react@18/umd/react.development.js" as="script" crossorigin="anonymous">
 
-    <!-- Favicon -->
+    <!-- Иконки -->
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
 
-    <!-- CSS -->
+    <!-- Стили -->
     <link rel="stylesheet" href="styles/main.css">
 
-    <!-- Preconnect to CDN -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://unpkg.com">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://unpkg.com">
-
-    <!-- Open Graph метатеги для соцсетей -->
+    <!-- Open Graph -->
     <meta property="og:title" content="Экологический мониторинг - Станция мониторинга">
     <meta property="og:description" content="Проект команды Рудирончики для кейс-чемпионата КАПЧА">
     <meta property="og:image" content="assets/images/preview.jpg">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://вашсайт.ру">
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Экологический мониторинг">
-    <meta name="twitter:description" content="Система визуализации экологических данных">
+    <!-- Принудительные стили для светлой темы -->
+    <style>
+        /* ==================== БЛОКИРОВКА ТЕМНОЙ ТЕМЫ ==================== */
+        :root, html, body {
+            color-scheme: light !important;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root, html, body {
+                color-scheme: light !important;
+            }
+
+            body {
+                background: linear-gradient(135deg, #45AEAC, #B0FAB4) !important;
+                color: #1a1a1a !important;
+            }
+
+            /* Белые блоки мониторинга */
+            .charts-chartjs,
+            .chartjs-container,
+            .filters,
+            .carousel__item {
+                background: #ffffff !important;
+                border-color: #e9ecef !important;
+                color: #1a1a1a !important;
+            }
+
+            /* Кнопки графиков без границ */
+            .charts__nav-btn {
+                background: #45AEAC !important;
+                color: #ffffff !important;
+                border: none !important;
+            }
+
+            /* Подвал */
+            .footer {
+                background: #1a1a1a !important;
+                color: #ffffff !important;
+            }
+        }
+    </style>
 </head>
-<body>
-    <!-- Корневой элемент для React приложения -->
-    <div id="root" aria-live="polite" aria-label="Приложение мониторинга экологических показателей">
-        <!-- Контент будет загружен JavaScript -->
-    </div>
+<body class="light-theme">
+    <div id="root" aria-live="polite" aria-label="Приложение мониторинга экологических показателей"></div>
 
-    <!-- React 18 с CDN -->
+    <!-- Библиотеки -->
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin="anonymous"></script>
-
-    <!-- Babel для JSX трансформации -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin="anonymous"></script>
-
-    <!-- Chart.js для красивых графиков -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js" crossorigin="anonymous"></script>
 
-    <!-- Обработчик глобальных ошибок -->
+    <!-- Обработка ошибок -->
     <script>
-        // Глобальный обработчик ошибок
         window.addEventListener('error', function(e) {
-            console.error('Application error:', e.error);
-
-            // Показываем friendly error message
             const root = document.getElementById('root');
             if (root) {
                 root.innerHTML = `
-                    <div class="error-container" style="
-                        padding: 3rem 2rem;
-                        text-align: center;
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        min-height: 100vh;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-family: 'Segoe UI', sans-serif;
-                    ">
-                        <div style="
-                            background: rgba(255, 255, 255, 0.1);
-                            backdrop-filter: blur(10px);
-                            padding: 2.5rem;
-                            border-radius: 1.5rem;
-                            max-width: 600px;
-                            border: 1px solid rgba(255, 255, 255, 0.2);
-                            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-                        ">
-                            <h2 style="margin-bottom: 1rem; font-size: 1.75rem;">
-                                ⚠️ Произошла ошибка
-                            </h2>
+                    <div style="padding: 3rem 2rem; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Segoe UI', sans-serif;">
+                        <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2.5rem; border-radius: 1.5rem; max-width: 600px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                            <h2 style="margin-bottom: 1rem; font-size: 1.75rem;">⚠️ Произошла ошибка</h2>
                             <p style="margin-bottom: 1.5rem; opacity: 0.9; line-height: 1.6;">
                                 При загрузке приложения возникла проблема.
                                 Это может быть связано с медленным интернетом или временными неполадками.
                             </p>
                             <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                                <button onclick="window.location.reload()" style="
-                                    padding: 0.75rem 1.5rem;
-                                    background: rgba(255, 255, 255, 0.2);
-                                    color: white;
-                                    border: 1px solid rgba(255, 255, 255, 0.3);
-                                    border-radius: 0.75rem;
-                                    cursor: pointer;
-                                    font-weight: 600;
-                                    transition: all 0.3s;
-                                    backdrop-filter: blur(5px);
-                                " onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'"
-                                onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+                                <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.75rem; cursor: pointer; font-weight: 600;">
                                     🔄 Обновить страницу
                                 </button>
-                                <button onclick="location.href='./'" style="
-                                    padding: 0.75rem 1.5rem;
-                                    background: rgba(69, 174, 172, 0.8);
-                                    color: white;
-                                    border: none;
-                                    border-radius: 0.75rem;
-                                    cursor: pointer;
-                                    font-weight: 600;
-                                    transition: all 0.3s;
-                                " onmouseover="this.style.background='rgba(69, 174, 172, 1)'"
-                                onmouseout="this.style.background='rgba(69, 174, 172, 0.8)'">
+                                <button onclick="location.href='./'" style="padding: 0.75rem 1.5rem; background: rgba(69, 174, 172, 0.8); color: white; border: none; border-radius: 0.75rem; cursor: pointer; font-weight: 600;">
                                     🏠 На главную
                                 </button>
                             </div>
-                            <p style="margin-top: 1.5rem; font-size: 0.875rem; opacity: 0.7;">
-                                Если ошибка повторяется, попробуйте очистить кэш браузера (Ctrl+Shift+R)
-                            </p>
                         </div>
                     </div>
                 `;
             }
         });
-
-        // Обработчик offline/online
-        window.addEventListener('offline', () => {
-            console.log('Приложение перешло в офлайн-режим');
-            // Можно показать уведомление
-            const notification = document.createElement('div');
-            notification.innerHTML = `
-                <div style="
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #FF6B6B;
-                    color: white;
-                    padding: 1rem;
-                    border-radius: 0.75rem;
-                    z-index: 9999;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-                    animation: slideIn 0.3s ease;
-                ">
-                    📶 Отсутствует подключение к интернету
-                </div>
-            `;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 5000);
-        });
-
-        // Удаляем уведомление при восстановлении связи
-        window.addEventListener('online', () => {
-            console.log('Подключение восстановлено');
-        });
     </script>
 
-    <!-- ========== ЗАГРУЗКА КОМПОНЕНТОВ ПРИЛОЖЕНИЯ ========== -->
-
-    <!-- Утилиты -->
+    <!-- Компоненты приложения -->
     <script src="js/utils/dateUtils.js" type="text/babel"></script>
     <script src="js/utils/chartUtils.js" type="text/babel"></script>
     <script src="js/utils/domUtils.js" type="text/babel"></script>
-
-    <!-- Сервисы -->
     <script src="js/services/DataService.js" type="text/babel"></script>
-
-    <!-- Компоненты -->
     <script src="js/components/Header.js" type="text/babel"></script>
     <script src="js/components/TeamCarousel.js" type="text/babel"></script>
     <script src="js/components/ChartContainerChartJS.js" type="text/babel"></script>
     <script src="js/components/Footer.js" type="text/babel"></script>
-
-    <!-- Главное приложение (должен загружаться последним) -->
     <script src="js/app.js" type="text/babel"></script>
 
-    <!-- Стили для анимаций -->
+    <!-- Дополнительные стили -->
     <style>
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Стили для скрытого контента до загрузки */
-        #root:empty::before {
-            content: '';
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            animation: fadeOut 0.5s ease 2s forwards;
-        }
-
+        /* Индикатор загрузки */
         #root:empty::after {
             content: '🔄 Загрузка приложения...';
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 10000;
             font-size: 1.25rem;
             animation: pulse 1.5s ease-in-out infinite;
         }
@@ -228,11 +138,7 @@
             50% { opacity: 1; }
         }
 
-        @keyframes fadeOut {
-            to { opacity: 0; visibility: hidden; }
-        }
-
-        /* Улучшение скролла */
+        /* Скроллбар */
         ::-webkit-scrollbar {
             width: 10px;
         }

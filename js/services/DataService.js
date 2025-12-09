@@ -1,29 +1,20 @@
-// Data service with caching
 class DataService {
     constructor() {
         this.cache = new Map();
-        this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+        this.cacheTimeout = 5 * 60 * 1000;
     }
 
-    // Получение данных с кэшированием
     async getChartData(filters) {
         const cacheKey = this.getCacheKey(filters);
-
-        // Проверка кэша
         const cached = this.cache.get(cacheKey);
-        if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
+
+        if (cached && this.isCacheValid(cached.timestamp)) {
             return cached.data;
         }
 
         try {
             const data = await this.fetchData(filters);
-
-            // Сохранение в кэш
-            this.cache.set(cacheKey, {
-                data: data,
-                timestamp: Date.now()
-            });
-
+            this.cache.set(cacheKey, { data, timestamp: Date.now() });
             return data;
         } catch (error) {
             console.error('DataService error:', error);
@@ -31,37 +22,54 @@ class DataService {
         }
     }
 
-    // Генерация ключа для кэша
     getCacheKey(filters) {
-        return `chart-${filters.region}-${filters.startDate}-${filters.endDate}`;
+        const startDate = filters.startDate.toISOString().split('T')[0];
+        const endDate = filters.endDate.toISOString().split('T')[0];
+        return `chart-${filters.region}-${startDate}-${endDate}`;
     }
 
-    // Запрос данных (заглушка для демо)
     async fetchData(filters) {
-        // Имитация загрузки
-        await new Promise(resolve => setTimeout(resolve, 500));
-
+        await this.delay(500);
         const daysDiff = DateUtils.getDaysDiff(filters.startDate, filters.endDate);
+        const types = ['temperature', 'humidity', 'pressure', 'insolation'];
+        const data = {};
+
+        types.forEach(type => {
+            data[type] = ChartUtils.generateMockData(filters.region, daysDiff, type);
+        });
 
         return {
-            temperature: ChartUtils.generateMockData(filters.region, daysDiff, 'temperature'),
-            humidity: ChartUtils.generateMockData(filters.region, daysDiff, 'humidity'),
-            pressure: ChartUtils.generateMockData(filters.region, daysDiff, 'pressure'),
-            insolation: ChartUtils.generateMockData(filters.region, daysDiff, 'insolation'),
-            metadata: {
-                region: filters.region,
-                period: `${filters.startDate.toISOString().split('T')[0]} - ${filters.endDate.toISOString().split('T')[0]}`,
-                generatedAt: new Date().toISOString()
-            }
+            ...data,
+            metadata: this.createMetadata(filters)
         };
     }
 
-    // Очистка кэша
+    createMetadata(filters) {
+        return {
+            region: filters.region,
+            period: this.formatPeriod(filters.startDate, filters.endDate),
+            generatedAt: new Date().toISOString()
+        };
+    }
+
+    formatPeriod(startDate, endDate) {
+        const startStr = startDate.toISOString().split('T')[0];
+        const endStr = endDate.toISOString().split('T')[0];
+        return `${startStr} - ${endStr}`;
+    }
+
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    isCacheValid(timestamp) {
+        return Date.now() - timestamp < this.cacheTimeout;
+    }
+
     clearCache() {
         this.cache.clear();
     }
 
-    // Получение статистики кэша
     getCacheStats() {
         return {
             size: this.cache.size,
@@ -70,5 +78,4 @@ class DataService {
     }
 }
 
-// Singleton instance
 window.DataService = new DataService();

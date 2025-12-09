@@ -1,4 +1,4 @@
-/* Modern CSS Reset */
+/* ==================== БАЗОВЫЙ СБРОС СТИЛЕЙ ==================== */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -29,11 +29,9 @@ input, button, textarea, select {
 
 button {
     cursor: pointer;
-    border: none;
-    background: none;
 }
 
-/* Remove animations for reduced motion */
+/* ==================== ДОСТУПНОСТЬ И АДАПТИВНОСТЬ ==================== */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;
@@ -46,7 +44,6 @@ button {
     }
 }
 
-/* Focus styles for accessibility */
 :focus-visible {
     outline: 2px solid var(--secondary);
     outline-offset: 2px;

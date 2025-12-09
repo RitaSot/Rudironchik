@@ -1,3 +1,24 @@
+/* ==================== СВЕТЛАЯ ТЕМА ==================== */
+document.documentElement.setAttribute('data-theme', 'light');
+document.documentElement.style.colorScheme = 'light';
+document.body.classList.add('light-theme');
+
+function enforceLightTheme() {
+    document.documentElement.style.colorScheme = 'light';
+    document.body.classList.remove('dark', 'dark-theme', 'dark-mode');
+    document.body.classList.add('light-theme');
+
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]') ||
+        (() => {
+            const meta = document.createElement('meta');
+            meta.name = 'theme-color';
+            document.head.appendChild(meta);
+            return meta;
+        })();
+    themeColorMeta.content = '#45AEAC';
+}
+
+/* ==================== ПРИЛОЖЕНИЕ ==================== */
 const App = () => {
     const scrollToSection = React.useCallback((sectionId) => {
         DomUtils.scrollToElement(sectionId, 80);
@@ -8,7 +29,6 @@ const App = () => {
 
         DomUtils.createElement('main', { className: 'app__main' },
             DomUtils.createElement('div', { className: 'container' },
-                // Навигационные кнопки
                 DomUtils.createElement('button', {
                     className: 'btn btn--primary btn--full mb-4',
                     onClick: () => scrollToSection('graphics')
@@ -21,16 +41,14 @@ const App = () => {
 
                 DomUtils.createElement('hr', { className: 'divider' }),
 
-                // Графики
                 DomUtils.createElement('section', { id: 'graphics' },
                     DomUtils.createElement(ChartContainerChartJS)
                 ),
 
                 DomUtils.createElement('hr', { className: 'divider' }),
 
-                // Команда
                 DomUtils.createElement('section', { id: 'team' },
-                    DomUtils.createElement('h2', { className: 'section-title' }, 
+                    DomUtils.createElement('h2', { className: 'section-title' },
                         'Участники проекта'
                     ),
                     DomUtils.createElement(TeamCarousel)
@@ -42,31 +60,28 @@ const App = () => {
     );
 };
 
-// Инициализация приложения
+/* ==================== ИНИЦИАЛИЗАЦИЯ ==================== */
 const initApp = () => {
     try {
-        // Настройка ленивой загрузки изображений
+        enforceLightTheme();
         DomUtils.setupLazyLoading();
 
-        // Рендеринг приложения
         ReactDOM.render(
             DomUtils.createElement(App),
             document.getElementById('root')
         );
 
-        // Логирование успешной загрузки
-        console.log('🚀 Приложение успешно запущено');
-        
+        console.log('Приложение запущено');
+
     } catch (error) {
-        console.error('❌ Ошибка инициализации приложения:', error);
-        
-        // Fallback UI
+        console.error('Ошибка инициализации:', error);
+
         document.getElementById('root').innerHTML = `
-            <div style="padding: 3rem; text-align: center; color: #666;">
-                <h2>Произошла ошибка при загрузке приложения</h2>
-                <p>Пожалуйста, обновите страницу или попробуйте позже</p>
-                <button onclick="window.location.reload()" 
-                        style="padding: 0.75rem 1.5rem; background: #45AEAC; color: white; border: none; border-radius: 0.5rem; cursor: pointer; margin-top: 1rem;">
+            <div style="padding: 3rem; text-align: center; background: white; color: #1a1a1a;">
+                <h2 style="margin-bottom: 1rem;">⚠️ Ошибка</h2>
+                <p style="margin-bottom: 1.5rem;">При загрузке приложения возникла проблема.</p>
+                <button onclick="window.location.reload()"
+                        style="padding: 0.75rem 1.5rem; background: #45AEAC; color: white; border: none; border-radius: 0.5rem; cursor: pointer;">
                     Обновить страницу
                 </button>
             </div>
@@ -74,9 +89,12 @@ const initApp = () => {
     }
 };
 
-// Запуск приложения когда DOM готов
+/* ==================== ЗАПУСК ==================== */
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initApp);
 } else {
     initApp();
 }
+
+/* ==================== ПЕРИОДИЧЕСКАЯ ПРОВЕРКА ==================== */
+setInterval(enforceLightTheme, 1000);

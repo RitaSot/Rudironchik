@@ -1,34 +1,29 @@
-/* Import utilities */
+/* ==================== ИМПОРТЫ ==================== */
 @import 'utils/reset.css';
 @import 'utils/variables.css';
 @import 'utils/animations.css';
-
-/* Import components */
 @import 'components/header.css';
 @import 'components/filters.css';
 @import 'components/charts.css';
 @import 'components/carousel.css';
 
-/* Global background */
+/* ==================== БАЗОВЫЕ СТИЛИ ==================== */
 html, body {
     min-height: 100vh;
     background: var(--bg-gradient);
-    background-attachment: fixed; /* Фиксируем градиент */
+    background-attachment: fixed;
+    color: var(--primary);
 }
 
-/* Main layout */
 .app {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: transparent; /* Убираем фон у app, т.к. он уже в body */
-    color: var(--primary);
 }
 
 .app__main {
     flex: 1;
     padding: var(--space-6) 0;
-    background: transparent;
 }
 
 .container {
@@ -37,7 +32,7 @@ html, body {
     padding: 0 var(--space-4);
 }
 
-/* Buttons */
+/* ==================== КНОПКИ ==================== */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -47,7 +42,6 @@ html, body {
     border-radius: var(--radius-md);
     font-size: var(--text-base);
     font-weight: 600;
-    text-decoration: none;
     cursor: pointer;
     transition: all var(--transition-base);
     box-shadow: var(--shadow-sm);
@@ -83,7 +77,7 @@ html, body {
     font-size: var(--text-lg);
 }
 
-/* Footer */
+/* ==================== ПОДВАЛ ==================== */
 .footer {
     background: var(--primary);
     color: var(--gray-300);
@@ -97,7 +91,7 @@ html, body {
     opacity: 0.8;
 }
 
-/* Divider */
+/* ==================== УТИЛИТЫ ==================== */
 .divider {
     border: none;
     height: 1px;
@@ -105,7 +99,6 @@ html, body {
     margin: var(--space-8) 0;
 }
 
-/* Utility classes */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -130,7 +123,6 @@ html, body {
     margin-bottom: var(--space-6);
 }
 
-/* Image fallback styles */
 .image-fallback {
     width: 100%;
     height: 100%;
@@ -143,14 +135,10 @@ html, body {
     border-radius: inherit;
 }
 
-/* Responsive design */
+/* ==================== АДАПТИВНОСТЬ ==================== */
 @media (max-width: 48rem) {
     .container {
         padding: 0 var(--space-3);
-    }
-
-    .charts {
-        padding: var(--space-4);
     }
 
     .filters__main {
@@ -187,15 +175,5 @@ html, body {
 
     .filters__main {
         grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (min-width: 64rem) {
-    .charts__wrapper {
-        min-height: 30rem;
-    }
-
-    .charts__line {
-        padding: var(--space-6);
     }
 }

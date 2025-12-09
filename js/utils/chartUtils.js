@@ -1,6 +1,4 @@
-// Chart utilities
 const ChartUtils = {
-    // Цвета для разных типов графиков
     colors: {
         temperature: {
             line: '#FF6B6B',
@@ -24,7 +22,6 @@ const ChartUtils = {
         }
     },
 
-    // Получение цветов для типа графика
     getColors(type) {
         return this.colors[type] || {
             line: '#45AEAC',
@@ -33,41 +30,30 @@ const ChartUtils = {
         };
     },
 
-    // Создание SVG path для линии
     createLinePath(data) {
         if (!data.length || data.length === 1) return '';
-
-        const maxValue = Math.max(...data);
-        const minValue = Math.min(...data);
-        const range = maxValue - minValue || 1;
-
-        const points = data.map((value, index) => {
-            const x = (index / (data.length - 1)) * 100;
-            const y = 60 - ((value - minValue) / range) * 50;
-            return `${x},${y}`;
-        });
-
-        return `M${points.join(' L')}`;
+        return `M${this.calculatePoints(data).join(' L')}`;
     },
 
-    // Создание SVG path для области под линией
     createAreaPath(data) {
         if (!data.length || data.length === 1) return '';
-
-        const maxValue = Math.max(...data);
-        const minValue = Math.min(...data);
-        const range = maxValue - minValue || 1;
-
-        const points = data.map((value, index) => {
-            const x = (index / (data.length - 1)) * 100;
-            const y = 60 - ((value - minValue) / range) * 50;
-            return `${x},${y}`;
-        });
-
+        const points = this.calculatePoints(data);
         return `M${points.join(' L')} L100,60 L0,60 Z`;
     },
 
-    // Генерация реалистичных данных для региона
+    calculatePoints(data) {
+        const maxValue = Math.max(...data);
+        const minValue = Math.min(...data);
+        const range = maxValue - minValue || 1;
+        const lastIndex = data.length - 1;
+
+        return data.map((value, index) => {
+            const x = (index / lastIndex) * 100;
+            const y = 60 - ((value - minValue) / range) * 50;
+            return `${x},${y}`;
+        });
+    },
+
     generateMockData(region, days, type) {
         const regionProfiles = {
             'moscow': {
@@ -91,17 +77,13 @@ const ChartUtils = {
         };
 
         const profile = regionProfiles[region] || regionProfiles['moscow'];
-        const config = profile[type];
-
+        const config = profile[type] || profile.temperature;
         const data = [];
+
         for (let i = 0; i < days; i++) {
-            // Сезонные колебания
             const seasonal = Math.sin(i / 30 * Math.PI * 2) * (config.range * config.seasonal);
-            // Случайные колебания
             const random = (Math.random() - 0.5) * (config.range * 0.3);
-            // Тренд
             const trend = i * config.trend;
-            // Суточные колебания
             const daily = Math.sin(i * 0.5) * (config.range * 0.1);
 
             const value = config.base + seasonal + random + trend + daily;
@@ -111,7 +93,6 @@ const ChartUtils = {
         return data;
     },
 
-    // Создание градиента для SVG
     createGradient(id, colors) {
         return React.createElement('linearGradient', {
             id: id,
@@ -132,11 +113,10 @@ const ChartUtils = {
         ]);
     },
 
-    // Создание сетки для графика
     createGrid(data) {
         const gridLines = [];
+        const lastIndex = data.length - 1;
 
-        // Горизонтальные линии
         [10, 30, 50].forEach(y => {
             gridLines.push(React.createElement('line', {
                 key: `h${y}`,
@@ -147,11 +127,11 @@ const ChartUtils = {
             }));
         });
 
-        // Вертикальные линии (только ключевые)
         const step = Math.max(1, Math.floor(data.length / 8));
+
         data.forEach((_, index) => {
             if (index % step === 0) {
-                const x = (index / (data.length - 1)) * 100;
+                const x = (index / lastIndex) * 100;
                 gridLines.push(React.createElement('line', {
                     key: `v${index}`,
                     x1: x, y1: "0",

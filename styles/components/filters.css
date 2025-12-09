@@ -1,14 +1,20 @@
-/* Filters */
+/* ==================== ОСНОВНОЙ БЛОК ФИЛЬТРОВ ==================== */
 .filters {
-    background: rgba(255, 255, 255, 0.95);
+    background: #ffffff;
     border-radius: var(--radius-lg);
     padding: var(--space-5);
     margin-bottom: var(--space-6);
-    border: 1px solid var(--gray-400);
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-sm);
+    border: 1px solid #dee2e6;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    animation: fadeIn 0.5s var(--transition-base) both;
 }
 
+.filters:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+/* ==================== БЫСТРЫЕ ФИЛЬТРЫ ==================== */
 .filters__quick {
     display: flex;
     gap: var(--space-3);
@@ -36,11 +42,12 @@
 .filters__quick-btn:focus-visible,
 .filters__quick-btn--active {
     background: var(--primary);
-    color: var(--white);
+    color: #ffffff;
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
 
+/* ==================== ОСНОВНЫЕ ФИЛЬТРЫ ==================== */
 .filters__main {
     display: grid;
     grid-template-columns: 1fr;
@@ -63,17 +70,18 @@
 .filters__input,
 .filters__select {
     padding: var(--space-3);
-    border: 1px solid var(--gray-400);
+    border: 1px solid #ced4da;
     border-radius: var(--radius-sm);
     font-size: var(--text-sm);
-    background: var(--white);
+    background: #ffffff;
     font-family: inherit;
     width: 100%;
     transition: border-color var(--transition-fast);
+    color: var(--primary);
 }
 
 .filters__select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     background-size: 12px;
@@ -88,13 +96,98 @@
     box-shadow: 0 0 0 3px rgba(69, 174, 172, 0.1);
 }
 
+/* ==================== ИНФОРМАЦИОННАЯ ПАНЕЛЬ ==================== */
 .filters__info {
     text-align: center;
     font-size: var(--text-sm);
-    color: var(--gray-600);
+    color: #6c757d;
     font-style: italic;
     padding: var(--space-3);
-    background: rgba(255, 255, 255, 0.5);
+    background: #f8f9fa;
     border-radius: var(--radius-sm);
-    border: 1px solid var(--gray-400);
+    border: 1px solid #dee2e6;
+}
+
+/* ==================== АДАПТИВНОСТЬ ==================== */
+@media (min-width: 48rem) {
+    .filters__main {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .filters {
+        padding: var(--space-4);
+    }
+
+    .filters__quick {
+        flex-direction: column;
+    }
+
+    .filters__quick-btn {
+        width: 100%;
+    }
+}
+
+/* ==================== СОСТОЯНИЯ ==================== */
+.filters__input:disabled,
+.filters__select:disabled,
+.filters__quick-btn:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+    border-color: #ced4da;
+    opacity: 0.7;
+}
+
+.filters__input::placeholder {
+    color: #adb5bd;
+}
+
+.filters__input:invalid,
+.filters__select:invalid {
+    border-color: #dc3545;
+}
+
+.filters__input:valid:focus,
+.filters__select:valid:focus {
+    border-color: var(--secondary);
+}
+
+/* ==================== АНИМАЦИИ ==================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== ДОСТУПНОСТЬ ==================== */
+.filters__quick-btn:focus-visible,
+.filters__input:focus-visible,
+.filters__select:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+}
+
+/* ==================== ПЕЧАТЬ ==================== */
+@media print {
+    .filters {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        background: white !important;
+        break-inside: avoid;
+    }
+
+    .filters__quick {
+        display: none;
+    }
+
+    .filters__info {
+        background: #f0f0f0 !important;
+    }
 }

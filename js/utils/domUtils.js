@@ -1,6 +1,5 @@
-// DOM utilities
+/* ==================== ОСНОВНЫЕ ФУНКЦИИ ==================== */
 const DomUtils = {
-    // Безопасное создание React элемента
     createElement(type, props, ...children) {
         try {
             return React.createElement(type, props, ...children);
@@ -10,7 +9,6 @@ const DomUtils = {
         }
     },
 
-    // Плавная прокрутка к элементу
     scrollToElement(elementId, offset = 0) {
         const element = document.getElementById(elementId);
         if (element) {
@@ -24,7 +22,6 @@ const DomUtils = {
         }
     },
 
-    // Обработчик ресайза с троттлингом
     createResizeHandler(callback, delay = 100) {
         let timeoutId;
         return function() {
@@ -33,7 +30,7 @@ const DomUtils = {
         };
     },
 
-    // Проверка поддержки WebP
+    /* ==================== ИЗОБРАЖЕНИЯ ==================== */
     supportsWebP() {
         return new Promise((resolve) => {
             const webP = new Image();
@@ -44,7 +41,6 @@ const DomUtils = {
         });
     },
 
-    // Ленивая загрузка изображений
     setupLazyLoading() {
         if ('IntersectionObserver' in window) {
             const imageObserver = new IntersectionObserver((entries) => {
@@ -64,14 +60,13 @@ const DomUtils = {
         }
     },
 
-    // Управление видимостью элементов
+    /* ==================== УТИЛИТЫ ==================== */
     setElementVisibility(element, visible) {
         if (element) {
             element.style.display = visible ? '' : 'none';
         }
     },
 
-    // Добавление CSS класса с префиксом
     addClass(element, className) {
         if (element) {
             element.classList.add(`app-${className}`);

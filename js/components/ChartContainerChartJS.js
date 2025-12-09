@@ -263,9 +263,9 @@ const ChartContainerChartJS = () => {
     }, []);
 
     return DomUtils.createElement('div', { className: 'charts-chartjs fade-in' },
-        // Заголовок
+        // Заголовок БЕЗ смайлика
         DomUtils.createElement('h2', { className: 'section-title' },
-            '📊 Мониторинг экологических показателей'
+            'Мониторинг экологических показателей'
         ),
 
         // ---------- ФИЛЬТРЫ (как в оригинале) ----------
@@ -354,7 +354,7 @@ const ChartContainerChartJS = () => {
             }, '‹'),
 
             DomUtils.createElement('div', { className: 'charts__title' },
-                loading ? '⏳ Загрузка данных...' : chartTypes[currentChartIndex].label
+                loading ? 'Загрузка данных...' : chartTypes[currentChartIndex].label
             ),
 
             DomUtils.createElement('button', {
