@@ -11,22 +11,30 @@ const DateUtils = {
         });
     },
 
-    getStartOfMonth(date) {
-        return new Date(date.getFullYear(), date.getMonth(), 1);
+    formatDateTime(date) {
+        return date.toLocaleString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     },
 
-    getStartOfWeek(date) {
-        const d = new Date(date);
-        const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-        return new Date(d.setDate(diff));
+    formatHour(date) {
+        return date.toLocaleTimeString('ru-RU', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     },
 
-    getEndOfWeek(date) {
-        const start = this.getStartOfWeek(date);
-        const end = new Date(start);
-        end.setDate(start.getDate() + 6);
-        return end;
+    formatMonth(date) {
+        const months = [
+            'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+        ];
+        const year = date.getFullYear();
+        return `${months[date.getMonth()]} ${year}`;
     },
 
     addDays(date, days) {
@@ -35,71 +43,42 @@ const DateUtils = {
         return result;
     },
 
+    addHours(date, hours) {
+        const result = new Date(date);
+        result.setHours(result.getHours() + hours);
+        return result;
+    },
+
+    addMonths(date, months) {
+        const result = new Date(date);
+        result.setMonth(result.getMonth() + months);
+        return result;
+    },
+
     getDaysDiff(startDate, endDate) {
-        return Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        const diffTime = Math.abs(endDate - startDate);
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     },
 
-    getMonthName(date) {
-        const months = [
-            'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-        ];
-        return months[date.getMonth()];
-    },
-
-    getChartLabels(startDate, endDate) {
-        const daysDiff = this.getDaysDiff(startDate, endDate);
-
-        if (daysDiff > 60) {
-            return this.getMonthLabels(startDate, endDate);
-        }
-
-        if (daysDiff > 14) {
-            return this.getWeekLabels(startDate, endDate, daysDiff);
-        }
-
-        return this.getDayLabels(startDate, endDate, daysDiff);
-    },
-
-    getMonthLabels(startDate, endDate) {
-        const monthLabels = [];
-        let current = new Date(startDate);
-        const end = new Date(endDate);
-
-        while (current <= end) {
-            const monthYear = this.getMonthName(current);
-            if (!monthLabels.includes(monthYear)) {
-                monthLabels.push(monthYear);
-            }
-            current = new Date(current.getFullYear(), current.getMonth() + 1, 1);
-        }
-        return monthLabels;
-    },
-
-    getWeekLabels(startDate, endDate, daysDiff) {
-        const weekLabels = [];
-        const step = Math.ceil(daysDiff / 8);
-
-        for (let i = 0; i < daysDiff; i += step) {
-            const date = this.addDays(startDate, i);
-            weekLabels.push(`${date.getDate()} ${this.getMonthName(date).substring(0, 3)}`);
-        }
-        return weekLabels;
-    },
-
-    getDayLabels(startDate, endDate, daysDiff) {
-        const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-        const dayLabels = [];
-
-        for (let i = 0; i < daysDiff; i++) {
-            const date = this.addDays(startDate, i);
-            dayLabels.push(`${days[date.getDay()]} ${date.getDate()}`);
-        }
-        return dayLabels;
+    getHoursDiff(startDate, endDate) {
+        const diffTime = Math.abs(endDate - startDate);
+        return Math.ceil(diffTime / (1000 * 60 * 60));
     },
 
     isValidDateRange(startDate, endDate) {
         return startDate <= endDate;
+    },
+
+    getChartLabels(startDate, endDate) {
+        const days = this.getDaysDiff(startDate, endDate);
+        const labels = [];
+
+        for (let i = 0; i <= days; i++) {
+            const currentDate = this.addDays(startDate, i);
+            labels.push(this.formatDisplayDate(currentDate));
+        }
+
+        return labels;
     }
 };
 

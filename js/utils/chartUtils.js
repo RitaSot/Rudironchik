@@ -54,21 +54,21 @@ const ChartUtils = {
         });
     },
 
-    generateMockData(region, days, type) {
+    generateMockData(region, points, type, interval = 'days') {
         const regionProfiles = {
-            'Москва': { // Было 'moscow'
+            'Москва': {
                 temperature: { base: 18, range: 15, trend: 0.1, seasonal: 0.3 },
                 humidity: { base: 65, range: 20, trend: -0.05, seasonal: 0.2 },
                 pressure: { base: 1013, range: 10, trend: 0.02, seasonal: 0.1 },
                 insolation: { base: 5000, range: 3000, trend: 0.15, seasonal: 0.4 }
             },
-            'Санкт-Петербург': { // Было 'saint-petersburg'
+            'Санкт-Петербург': {
                 temperature: { base: 15, range: 12, trend: 0.08, seasonal: 0.25 },
                 humidity: { base: 75, range: 15, trend: -0.03, seasonal: 0.15 },
                 pressure: { base: 1010, range: 12, trend: 0.01, seasonal: 0.08 },
                 insolation: { base: 3500, range: 2500, trend: 0.12, seasonal: 0.35 }
             },
-            'Краснодарский край': { // Было 'krasnodar'
+            'Краснодарский край': {
                 temperature: { base: 22, range: 10, trend: 0.12, seasonal: 0.35 },
                 humidity: { base: 60, range: 25, trend: -0.08, seasonal: 0.25 },
                 pressure: { base: 1015, range: 8, trend: 0.03, seasonal: 0.12 },
@@ -80,13 +80,38 @@ const ChartUtils = {
         const config = profile[type] || profile.temperature;
         const data = [];
 
-        for (let i = 0; i < days; i++) {
-            const seasonal = Math.sin(i / 30 * Math.PI * 2) * (config.range * config.seasonal);
-            const random = (Math.random() - 0.5) * (config.range * 0.3);
-            const trend = i * config.trend;
-            const daily = Math.sin(i * 0.5) * (config.range * 0.1);
+        for (let i = 0; i < points; i++) {
+            let value;
 
-            const value = config.base + seasonal + random + trend + daily;
+            if (interval === 'hours') {
+                const hour = i % 24;
+                const dailyCycle = Math.sin((hour - 6) * Math.PI / 12);
+                value = config.base + (dailyCycle * config.range) + (Math.random() - 0.5) * config.range * 0.1;
+            } else if (interval === 'months') {
+                const month = i % 12;
+                const seasonalCycle = Math.sin((month - 3) * Math.PI / 6);
+                value = config.base + (seasonalCycle * config.range * config.seasonal) + (Math.random() - 0.5) * config.range * 0.05;
+            } else {
+                const dayCycle = Math.sin(i * 0.5) * (config.range * 0.1);
+                const season = Math.sin(i / 30 * Math.PI * 2) * (config.range * config.seasonal);
+                value = config.base + season + dayCycle + (Math.random() - 0.5) * (config.range * 0.3);
+            }
+
+            switch (type) {
+                case 'temperature':
+                    value = Math.min(Math.max(value, -20), 40);
+                    break;
+                case 'humidity':
+                    value = Math.min(Math.max(value, 30), 95);
+                    break;
+                case 'pressure':
+                    value = Math.min(Math.max(value, 950), 1050);
+                    break;
+                case 'insolation':
+                    value = Math.max(0, value);
+                    break;
+            }
+
             data.push(Math.round(value * 10) / 10);
         }
 

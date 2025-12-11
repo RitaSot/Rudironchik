@@ -21,13 +21,11 @@ const TeamCarousel = () => {
         }
     ], []);
 
-    // Функция для получения полного пути к изображению
     const getImagePath = React.useCallback((filename) => {
         const basePath = window.IMAGE_BASE_PATH || './assets/images/';
         return `${basePath}${filename}`;
     }, []);
 
-    // Предзагрузка изображений
     React.useEffect(() => {
         teamMembers.forEach(member => {
             const img = new Image();
@@ -39,7 +37,6 @@ const TeamCarousel = () => {
                 }));
             };
             img.onerror = () => {
-                console.warn(`Не удалось загрузить изображение: ${member.photo}`);
                 setLoadedImages(prev => ({
                     ...prev,
                     [member.photo]: false
@@ -83,26 +80,20 @@ const TeamCarousel = () => {
 
         if (imageLoaded === false) {
             return DomUtils.createElement('div', {
-                className: 'carousel__photo image-fallback',
-                key: `fallback-${member.photo}`
+                className: 'carousel__photo image-fallback'
             },
                 DomUtils.createElement('span', null, member.name.split(' ')[0])
             );
         }
 
-        return DomUtils.createElement('div', {
-            className: 'carousel__photo',
-            key: `photo-${member.photo}`
-        },
+        return DomUtils.createElement('div', { className: 'carousel__photo' },
             DomUtils.createElement('img', {
                 src: imagePath,
                 alt: member.name,
                 className: 'carousel__image',
                 loading: 'lazy',
                 onError: (e) => {
-                    console.warn(`Ошибка загрузки изображения: ${imagePath}`);
                     e.target.style.display = 'none';
-                    // Показываем fallback
                     const fallback = e.target.parentElement.querySelector('.image-fallback')
                         || DomUtils.createElement('div', {
                             className: 'image-fallback'
