@@ -14,40 +14,50 @@ const ChartContainerChartJS = () => {
     });
 
     const chartTypes = React.useMemo(() => [
-        {
-            id: 'temperature',
-            label: 'Температура воздуха, °C',
-            color: '#FF6B6B',
-            gradient: ['#FF6B6B', '#FF8E8E'],
-            unit: '°C'
-        },
-        {
-            id: 'humidity',
-            label: 'Относительная влажность, %',
-            color: '#4ECDC4',
-            gradient: ['#4ECDC4', '#6ED9D2'],
-            unit: '%'
-        },
-        {
-            id: 'pressure',
-            label: 'Атмосферное давление, гПа',
-            color: '#45B7D1',
-            gradient: ['#45B7D1', '#65C7E1'],
-            unit: 'гПа'
-        },
-        {
-            id: 'insolation',
-            label: 'Коэффициент солнечной инсоляции, Вт/м²',
-            color: '#FFD166',
-            gradient: ['#FFD166', '#FFDF99'],
-            unit: 'Вт/м²'
-        }
+        { id: 'temperature', label: 'Температура воздуха, °C', color: '#FF6B6B', gradient: ['#FF6B6B', '#FF8E8E'], unit: '°C' },
+        { id: 'humidity', label: 'Относительная влажность, %', color: '#4ECDC4', gradient: ['#4ECDC4', '#6ED9D2'], unit: '%' },
+        { id: 'pressure', label: 'Атмосферное давление, гПа', color: '#45B7D1', gradient: ['#45B7D1', '#65C7E1'], unit: 'гПа' },
+        { id: 'insolation', label: 'Коэффициент солнечной инсоляции, Вт/м²', color: '#FFD166', gradient: ['#FFD166', '#FFDF99'], unit: 'Вт/м²' }
     ], []);
+
+    const [theme, setTheme] = React.useState(() => {
+        return document.documentElement.getAttribute('data-theme') || 'light';
+    });
+
+    /* ==================== ТЕМА ==================== */
+    React.useEffect(() => {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'data-theme') {
+                    const newTheme = document.documentElement.getAttribute('data-theme');
+                    setTheme(newTheme);
+
+                    if (!loading && chartRefs.current[currentChartIndex]) {
+                        setTimeout(() => renderChart(), 100);
+                    }
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
+
+        return () => observer.disconnect();
+    }, [loading, currentChartIndex]);
 
     React.useEffect(() => {
         loadChartData();
     }, [filters, timeInterval, useDemoData]);
 
+    React.useEffect(() => {
+        if (!loading && chartRefs.current[currentChartIndex] && chartData.labels) {
+            renderChart();
+        }
+    }, [currentChartIndex, loading, chartData, timeInterval, theme]);
+
+    /* ==================== ЗАГРУЗКА ДАННЫХ ==================== */
     const loadChartData = React.useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -96,6 +106,7 @@ const ChartContainerChartJS = () => {
         }
     }, [filters, timeInterval, useDemoData]);
 
+    /* ==================== УТИЛИТЫ ДЛЯ МЕТОК ==================== */
     const fixHourLabels = (labels, timestamps) => {
         if (timestamps && timestamps.length > 0) {
             return timestamps.map(ts => {
@@ -155,6 +166,7 @@ const ChartContainerChartJS = () => {
         return months[monthName.toLowerCase()] || null;
     };
 
+    /* ==================== ДЕМО-ДАННЫЕ ==================== */
     const generateLocalDemoData = async () => {
         const daysDiff = DateUtils.getDaysDiff(filters.startDate, filters.endDate);
         const hoursDiff = DateUtils.getHoursDiff(filters.startDate, filters.endDate);
@@ -270,18 +282,10 @@ const ChartContainerChartJS = () => {
             value += (Math.random() - 0.5) * range * 0.05;
 
             switch(type) {
-                case 'temperature':
-                    value = Math.max(-10, Math.min(35, value));
-                    break;
-                case 'humidity':
-                    value = Math.max(30, Math.min(95, value));
-                    break;
-                case 'pressure':
-                    value = Math.max(980, Math.min(1040, value));
-                    break;
-                case 'insolation':
-                    value = Math.max(0, Math.min(1200, value));
-                    break;
+                case 'temperature': value = Math.max(-10, Math.min(35, value)); break;
+                case 'humidity': value = Math.max(30, Math.min(95, value)); break;
+                case 'pressure': value = Math.max(980, Math.min(1040, value)); break;
+                case 'insolation': value = Math.max(0, Math.min(1200, value)); break;
             }
 
             data.push(parseFloat(value.toFixed(2)));
@@ -290,12 +294,7 @@ const ChartContainerChartJS = () => {
         return data;
     };
 
-    React.useEffect(() => {
-        if (!loading && chartRefs.current[currentChartIndex] && chartData.labels) {
-            renderChart();
-        }
-    }, [currentChartIndex, loading, chartData, timeInterval]);
-
+    /* ==================== РЕНДЕР ГРАФИКА ==================== */
     const renderChart = () => {
         const canvas = chartRefs.current[currentChartIndex];
         if (!canvas) return;
@@ -319,10 +318,17 @@ const ChartContainerChartJS = () => {
         gradient.addColorStop(1, chartType.gradient[1] + '20');
         const isHourly = timeInterval === 'hours';
 
+        const isDarkTheme = theme === 'dark';
+        const textColor = isDarkTheme ? '#e9ecef' : '#333333';
+        const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+        const axisColor = isDarkTheme ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)';
+        const tooltipBgColor = isDarkTheme ? 'rgba(30, 30, 30, 0.95)' : 'rgba(26, 26, 26, 0.9)';
+        const tooltipTextColor = isDarkTheme ? '#e9ecef' : '#ffffff';
+
         const xAxisConfig = {
-            grid: { color: 'rgba(0, 0, 0, 0.03)' },
+            grid: { color: axisColor },
             ticks: {
-                color: '#666666',
+                color: textColor,
                 font: { size: isHourly ? 10 : 11, family: "'Segoe UI', sans-serif" },
                 maxRotation: isHourly ? 45 : 0,
                 minRotation: isHourly ? 45 : 0,
@@ -338,7 +344,7 @@ const ChartContainerChartJS = () => {
             title: {
                 display: true,
                 text: isHourly ? 'Время (часы)' : 'Дата',
-                color: '#666666',
+                color: textColor,
                 font: { size: 12, weight: 'normal' }
             }
         };
@@ -348,7 +354,7 @@ const ChartContainerChartJS = () => {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: `${chartType.label}`,
+                    label: chartType.label,
                     data: displayData,
                     borderColor: chartType.color,
                     backgroundColor: gradient,
@@ -356,30 +362,22 @@ const ChartContainerChartJS = () => {
                     fill: true,
                     tension: 0.4,
                     pointBackgroundColor: chartType.color,
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointRadius: isHourly ? 3 : 4,
-                    pointHoverRadius: isHourly ? 5 : 6,
-                    pointHoverBorderWidth: 3
+                    pointBorderColor: 'transparent',
+                    pointBorderWidth: 0,
+                    pointRadius: isHourly ? 4 : 5,
+                    pointHoverRadius: isHourly ? 6 : 7,
+                    pointHoverBorderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            color: '#1a1a1a',
-                            font: { size: 14, family: "'Segoe UI', sans-serif" },
-                            padding: 20
-                        }
-                    },
+                    legend: { display: false },
                     tooltip: {
-                        backgroundColor: 'rgba(26, 26, 26, 0.9)',
-                        titleColor: '#ffffff',
-                        bodyColor: '#ffffff',
+                        backgroundColor: tooltipBgColor,
+                        titleColor: tooltipTextColor,
+                        bodyColor: tooltipTextColor,
                         padding: 12,
                         cornerRadius: 8,
                         displayColors: false,
@@ -403,9 +401,9 @@ const ChartContainerChartJS = () => {
                 scales: {
                     y: {
                         beginAtZero: false,
-                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        grid: { color: gridColor },
                         ticks: {
-                            color: '#666666',
+                            color: textColor,
                             font: { size: 12, family: "'Segoe UI', sans-serif" },
                             padding: 10,
                             callback: (value) => `${value.toFixed(1)} ${chartType.unit}`
@@ -413,7 +411,7 @@ const ChartContainerChartJS = () => {
                         title: {
                             display: true,
                             text: chartType.unit,
-                            color: '#666666',
+                            color: textColor,
                             font: { size: 12, weight: 'normal' }
                         }
                     },
@@ -425,6 +423,7 @@ const ChartContainerChartJS = () => {
         });
     };
 
+    /* ==================== УТИЛИТЫ ==================== */
     const ensureHourLabels = (labels) => {
         return labels.map(label => {
             if (typeof label === 'string' && /^\d{1,2}:\d{2}$/.test(label)) return label;
@@ -440,6 +439,7 @@ const ChartContainerChartJS = () => {
         });
     };
 
+    /* ==================== ОБРАБОТЧИКИ ==================== */
     const handleTimeIntervalChange = (e) => {
         const newInterval = e.target.value;
         setTimeInterval(newInterval);
@@ -451,8 +451,6 @@ const ChartContainerChartJS = () => {
             setFilters({ startDate: start, endDate: end });
         }
     };
-
-    const handleDataSourceToggle = () => setUseDemoData(!useDemoData);
 
     const handleStartDateChange = (e) => {
         const newDate = new Date(e.target.value);
@@ -517,6 +515,7 @@ const ChartContainerChartJS = () => {
 
     const refreshData = () => loadChartData();
 
+    /* ==================== РЕНДЕР КОМПОНЕНТА ==================== */
     return DomUtils.createElement('div', { className: 'charts-chartjs fade-in' },
         DomUtils.createElement('h2', { className: 'section-title' }, '📊 Мониторинг экологических показателей'),
 
