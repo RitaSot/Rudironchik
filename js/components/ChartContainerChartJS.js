@@ -13,12 +13,12 @@ const ChartContainerChartJS = () => {
         endDate: new Date()
     });
 
-    const chartTypes = [
+    const chartTypes = React.useMemo(() => [
         { id: 'temperature', label: 'Температура воздуха, °C', color: '#FF6B6B', gradient: ['#FF6B6B', '#FF8E8E'], unit: '°C' },
         { id: 'humidity', label: 'Относительная влажность, %', color: '#4ECDC4', gradient: ['#4ECDC4', '#6ED9D2'], unit: '%' },
         { id: 'pressure', label: 'Атмосферное давление, гПа', color: '#45B7D1', gradient: ['#45B7D1', '#65C7E1'], unit: 'гПа' },
         { id: 'insolation', label: 'Уровень освещенности, лк', color: '#FFD166', gradient: ['#FFD166', '#FFDF99'], unit: 'лк' }
-    ];
+    ], []);
 
     React.useEffect(() => {
         loadChartData();
@@ -495,242 +495,156 @@ const ChartContainerChartJS = () => {
 
     return DomUtils.createElement('div', { className: 'charts-chartjs fade-in' },
         DomUtils.createElement('h2', { className: 'section-title' }, '📊 Мониторинг экологических показателей'),
-        DomUtils.createElement('div', { className: 'data-control-panel' },
-            DomUtils.createElement('div', {
-                className: 'data-source-toggle',
-                style: {
-                    display: 'flex', alignItems: 'center', gap: 'var(--space-3)',
-                    marginBottom: 'var(--space-3)', padding: 'var(--space-3)',
-                    backgroundColor: '#f8f9fa', borderRadius: 'var(--radius-md)',
-                    border: '1px solid #dee2e6'
-                }
-            },
-                DomUtils.createElement('span', {
-                    style: { fontSize: 'var(--text-sm)', fontWeight: '600', color: '#495057' }
-                }, 'Источник данных:'),
-                DomUtils.createElement('button', {
-                    onClick: () => setUseDemoData(false),
-                    disabled: loading || !useDemoData,
-                    style: {
-                        padding: 'var(--space-2) var(--space-3)',
-                        backgroundColor: !useDemoData ? '#45AEAC' : 'transparent',
-                        color: !useDemoData ? 'white' : '#45AEAC',
-                        border: `2px solid ${!useDemoData ? '#45AEAC' : '#dee2e6'}`,
-                        borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)',
-                        fontWeight: !useDemoData ? '600' : '400', cursor: 'pointer',
-                        transition: 'all 0.3s', display: 'flex', alignItems: 'center',
-                        gap: 'var(--space-1)'
-                    }
-                }, DomUtils.createElement('span', null, '📡'), 'ThingSpeak'),
-                DomUtils.createElement('button', {
-                    onClick: () => setUseDemoData(true),
-                    disabled: loading || useDemoData,
-                    style: {
-                        padding: 'var(--space-2) var(--space-3)',
-                        backgroundColor: useDemoData ? '#6c757d' : 'transparent',
-                        color: useDemoData ? 'white' : '#6c757d',
-                        border: `2px solid ${useDemoData ? '#6c757d' : '#dee2e6'}`,
-                        borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)',
-                        fontWeight: useDemoData ? '600' : '400', cursor: 'pointer',
-                        transition: 'all 0.3s', display: 'flex', alignItems: 'center',
-                        gap: 'var(--space-1)'
-                    }
-                }, DomUtils.createElement('span', null, '🔄'), 'Демо'),
 
-                DomUtils.createElement('div', {
-                    className: 'data-actions',
-                    style: {
-                        marginLeft: 'auto',
-                        display: 'flex',
-                        gap: 'var(--space-2)',
-                        alignItems: 'center'
-                    }
+        DomUtils.createElement('div', { className: 'data-control-panel' },
+            DomUtils.createElement('div', { className: 'data-source-toggle' },
+                DomUtils.createElement('span', { className: 'data-source-label' }, 'Источник данных:'),
+
+                DomUtils.createElement('button', {
+                    className: `source-btn ${!useDemoData ? 'source-btn-active' : ''}`,
+                    onClick: () => setUseDemoData(false),
+                    disabled: loading || !useDemoData
                 },
+                    DomUtils.createElement('span', { className: 'btn-icon' }, '📡'),
+                    'ThingSpeak'
+                ),
+
+                DomUtils.createElement('button', {
+                    className: `source-btn ${useDemoData ? 'source-btn-active' : ''}`,
+                    onClick: () => setUseDemoData(true),
+                    disabled: loading || useDemoData
+                },
+                    DomUtils.createElement('span', { className: 'btn-icon' }, '🔄'),
+                    'Демо'
+                ),
+
+                DomUtils.createElement('div', { className: 'data-actions' },
+                    // Десктопные кнопки
                     !useDemoData && DomUtils.createElement('button', {
+                        className: 'action-btn test-connection-btn desktop-btn',
                         onClick: testThingSpeakConnection,
                         disabled: loading,
-                        className: 'test-connection-btn desktop-btn',
-                        style: {
-                            padding: 'var(--space-2) var(--space-3)',
-                            backgroundColor: '#28a745', color: 'white', border: 'none',
-                            borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)',
-                            cursor: 'pointer', display: 'flex', alignItems: 'center',
-                            gap: 'var(--space-1)', whiteSpace: 'nowrap'
-                        }
-                    }, DomUtils.createElement('span', null, '🔍'), 'Проверить подключение'),
+                        title: 'Проверить подключение к ThingSpeak'
+                    },
+                        DomUtils.createElement('span', { className: 'btn-icon' }, '🔍'),
+                        'Проверить подключение'
+                    ),
 
                     DomUtils.createElement('button', {
+                        className: 'action-btn refresh-btn desktop-btn',
                         onClick: refreshData,
                         disabled: loading,
-                        className: 'refresh-btn desktop-btn',
-                        style: {
-                            padding: 'var(--space-2) var(--space-3)',
-                            backgroundColor: '#17a2b8', color: 'white', border: 'none',
-                            borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)',
-                            cursor: 'pointer', display: 'flex', alignItems: 'center',
-                            gap: 'var(--space-1)', whiteSpace: 'nowrap'
-                        }
-                    }, DomUtils.createElement('span', null, '🔄'), 'Обновить'),
-
-                    DomUtils.createElement('div', {
-                        className: 'mobile-actions',
-                        style: {
-                            display: 'none',
-                            gap: 'var(--space-1)',
-                            alignItems: 'center'
-                        }
+                        title: 'Обновить данные'
                     },
+                        DomUtils.createElement('span', { className: 'btn-icon' }, '🔄'),
+                        'Обновить'
+                    ),
+
+                    // Мобильные кнопки (иконки)
+                    DomUtils.createElement('div', { className: 'mobile-actions' },
                         !useDemoData && DomUtils.createElement('button', {
+                            className: 'mobile-action-btn test-btn',
                             onClick: testThingSpeakConnection,
                             disabled: loading,
-                            className: 'mobile-action-btn test-btn',
-                            style: {
-                                padding: 'var(--space-1)',
-                                backgroundColor: '#28a745', color: 'white', border: 'none',
-                                borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)',
-                                cursor: 'pointer', display: 'flex', alignItems: 'center',
-                                justifyContent: 'center', width: '32px', height: '32px'
-                            },
                             title: 'Проверить подключение к ThingSpeak'
-                        }, DomUtils.createElement('span', null, '🔍')),
+                        }, '🔍'),
 
                         DomUtils.createElement('button', {
+                            className: 'mobile-action-btn refresh-btn-mobile',
                             onClick: refreshData,
                             disabled: loading,
-                            className: 'mobile-action-btn refresh-btn-mobile',
-                            style: {
-                                padding: 'var(--space-1)',
-                                backgroundColor: '#17a2b8', color: 'white', border: 'none',
-                                borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)',
-                                cursor: 'pointer', display: 'flex', alignItems: 'center',
-                                justifyContent: 'center', width: '32px', height: '32px'
-                            },
                             title: 'Обновить данные'
-                        }, DomUtils.createElement('span', null, '🔄'))
+                        }, '🔄')
                     )
                 )
             ),
-            DomUtils.createElement('div', {
-                className: 'data-info',
-                style: {
-                    backgroundColor: '#f8f9fa', border: '1px solid #dee2e6',
-                    borderRadius: 'var(--radius-sm)', padding: 'var(--space-3)',
-                    fontSize: 'var(--text-sm)'
-                }
-            },
-                DomUtils.createElement('div', {
-                    style: { display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-1)' }
-                },
+
+            DomUtils.createElement('div', { className: 'data-info' },
+                DomUtils.createElement('div', { className: 'info-row' },
                     DomUtils.createElement('span', null,
-                        DomUtils.createElement('strong', { style: { color: '#45AEAC' } }, 'Источник: '),
+                        DomUtils.createElement('strong', null, 'Источник: '),
                         getDataSourceText()
                     ),
                     DomUtils.createElement('span', null,
-                        DomUtils.createElement('strong', { style: { color: '#45AEAC' } }, 'Режим: '),
+                        DomUtils.createElement('strong', null, 'Режим: '),
                         getIntervalText()
                     )
                 ),
-                chartData.metadata && DomUtils.createElement('div', {
-                    style: {
-                        fontSize: 'var(--text-xs)', color: '#6c757d',
-                        borderTop: '1px solid #dee2e6', paddingTop: 'var(--space-1)',
-                        marginTop: 'var(--space-1)'
-                    }
-                },
+                chartData.metadata && DomUtils.createElement('div', { className: 'metadata-info' },
                     DomUtils.createElement('span', null, chartData.metadata.note || 'Данные загружены'),
-                    chartData.metadata.period && DomUtils.createElement('span', {
-                        style: { marginLeft: 'var(--space-2)', fontStyle: 'italic' }
-                    }, `(${chartData.metadata.period})`)
+                    chartData.metadata.period && DomUtils.createElement('span', { className: 'metadata-period' },
+                        ` (${chartData.metadata.period})`
+                    )
                 )
             )
         ),
-        DomUtils.createElement('div', {
-            className: 'interval-filters',
-            style: {
-                marginBottom: 'var(--space-4)', padding: 'var(--space-4)',
-                backgroundColor: '#ffffff', borderRadius: 'var(--radius-lg)',
-                border: '1px solid #dee2e6', boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-            }
-        },
-            DomUtils.createElement('div', { style: { marginBottom: 'var(--space-3)' } },
+
+        DomUtils.createElement('div', { className: 'interval-filters' },
+            DomUtils.createElement('div', { className: 'interval-selector' },
                 DomUtils.createElement('label', {
                     htmlFor: 'time-interval',
-                    className: 'filters__label',
-                    style: { display: 'block', marginBottom: 'var(--space-2)' }
+                    className: 'filters__label'
                 }, '📅 Интервал отображения:'),
+
                 DomUtils.createElement('select', {
                     id: 'time-interval',
                     className: 'filters__input',
                     value: timeInterval,
                     onChange: handleTimeIntervalChange,
-                    disabled: loading,
-                    style: { width: '100%' }
+                    disabled: loading
                 },
-                    DomUtils.createElement('option', { value: 'hours' }, '⏰ По часам (14:00, 15:00...)'),
-                    DomUtils.createElement('option', { value: 'days' }, '📅 По дням (15 января, 16 января...)'),
-                    DomUtils.createElement('option', { value: 'months' }, '📆 По месяцам (Январь 2024...)'),
-                    DomUtils.createElement('option', { value: 'auto' }, '🔄 Автоопределение')
+                    DomUtils.createElement('option', { value: 'hours' }, '⏰ По часам'),
+                    DomUtils.createElement('option', { value: 'days' }, '📅 По дням'),
+                    DomUtils.createElement('option', { value: 'months' }, '📆 По месяцам'),
+                    DomUtils.createElement('option', { value: 'auto' }, '🔄 Авто')
                 )
             ),
+
             DomUtils.createElement('div', { className: 'filters__quick' },
                 DomUtils.createElement('button', {
-                    className: 'filters__quick-btn',
+                    className: `filters__quick-btn ${timeInterval === 'hours' ? 'active' : ''}`,
                     onClick: () => setHourRange(6),
-                    disabled: loading,
-                    style: {
-                        backgroundColor: timeInterval === 'hours' ? '#45AEAC' : undefined,
-                        color: timeInterval === 'hours' ? 'white' : undefined
-                    }
+                    disabled: loading
                 }, '6 часов'),
+
                 DomUtils.createElement('button', {
-                    className: 'filters__quick-btn',
+                    className: `filters__quick-btn ${timeInterval === 'hours' ? 'active' : ''}`,
                     onClick: () => setHourRange(12),
-                    disabled: loading,
-                    style: {
-                        backgroundColor: timeInterval === 'hours' ? '#45AEAC' : undefined,
-                        color: timeInterval === 'hours' ? 'white' : undefined
-                    }
+                    disabled: loading
                 }, '12 часов'),
+
                 DomUtils.createElement('button', {
-                    className: 'filters__quick-btn',
+                    className: `filters__quick-btn ${timeInterval === 'hours' ? 'active' : ''}`,
                     onClick: () => setHourRange(24),
-                    disabled: loading,
-                    style: {
-                        backgroundColor: timeInterval === 'hours' ? '#45AEAC' : undefined,
-                        color: timeInterval === 'hours' ? 'white' : undefined
-                    }
+                    disabled: loading
                 }, '24 часа'),
+
                 DomUtils.createElement('button', {
-                    className: 'filters__quick-btn',
+                    className: `filters__quick-btn ${timeInterval === 'days' ? 'active' : ''}`,
                     onClick: () => setDateRange(7),
-                    disabled: loading,
-                    style: {
-                        backgroundColor: timeInterval === 'days' ? '#45AEAC' : undefined,
-                        color: timeInterval === 'days' ? 'white' : undefined
-                    }
+                    disabled: loading
                 }, '7 дней'),
+
                 DomUtils.createElement('button', {
-                    className: 'filters__quick-btn',
+                    className: `filters__quick-btn ${timeInterval === 'days' ? 'active' : ''}`,
                     onClick: () => setDateRange(30),
-                    disabled: loading,
-                    style: {
-                        backgroundColor: timeInterval === 'days' ? '#45AEAC' : undefined,
-                        color: timeInterval === 'days' ? 'white' : undefined
-                    }
+                    disabled: loading
                 }, '30 дней'),
+
                 DomUtils.createElement('button', {
-                    className: 'filters__quick-btn',
+                    className: `filters__quick-btn ${timeInterval === 'days' ? 'active' : ''}`,
                     onClick: () => setDateRange(90),
-                    disabled: loading,
-                    style: {
-                        backgroundColor: timeInterval === 'days' ? '#45AEAC' : undefined,
-                        color: timeInterval === 'days' ? 'white' : undefined
-                    }
+                    disabled: loading
                 }, '90 дней')
             ),
-            DomUtils.createElement('div', { className: 'filters__main', style: { marginTop: 'var(--space-3)' } },
+
+            DomUtils.createElement('div', { className: 'filters__main' },
                 DomUtils.createElement('div', { className: 'filters__group' },
-                    DomUtils.createElement('label', { htmlFor: 'start-date', className: 'filters__label' }, 'Начало:'),
+                    DomUtils.createElement('label', {
+                        htmlFor: 'start-date',
+                        className: 'filters__label'
+                    }, 'Начало:'),
+
                     DomUtils.createElement('input', {
                         id: 'start-date',
                         type: timeInterval === 'hours' ? 'datetime-local' : 'date',
@@ -745,8 +659,13 @@ const ChartContainerChartJS = () => {
                         disabled: loading
                     })
                 ),
+
                 DomUtils.createElement('div', { className: 'filters__group' },
-                    DomUtils.createElement('label', { htmlFor: 'end-date', className: 'filters__label' }, 'Конец:'),
+                    DomUtils.createElement('label', {
+                        htmlFor: 'end-date',
+                        className: 'filters__label'
+                    }, 'Конец:'),
+
                     DomUtils.createElement('input', {
                         id: 'end-date',
                         type: timeInterval === 'hours' ? 'datetime-local' : 'date',
@@ -763,21 +682,27 @@ const ChartContainerChartJS = () => {
                 )
             )
         ),
+
         DomUtils.createElement('div', { className: 'charts__controls' },
             DomUtils.createElement('button', {
                 className: 'charts__nav-btn',
                 onClick: prevChart,
-                disabled: loading
+                disabled: loading,
+                'aria-label': 'Предыдущий график'
             }, '‹'),
+
             DomUtils.createElement('div', { className: 'charts__title' },
                 loading ? 'Загрузка данных...' : `${chartTypes[currentChartIndex].label}`
             ),
+
             DomUtils.createElement('button', {
                 className: 'charts__nav-btn',
                 onClick: nextChart,
-                disabled: loading
+                disabled: loading,
+                'aria-label': 'Следующий график'
             }, '›')
         ),
+
         DomUtils.createElement('div', { className: 'chartjs-container' },
             loading ?
                 DomUtils.createElement('div', { className: 'charts__loading' },
@@ -789,43 +714,33 @@ const ChartContainerChartJS = () => {
                     className: 'chartjs-canvas'
                 })
         ),
+
         DomUtils.createElement('div', { className: 'charts__indicators' },
             chartTypes.map((_, index) =>
                 DomUtils.createElement('button', {
                     key: index,
                     className: `charts__indicator ${index === currentChartIndex ? 'charts__indicator--active' : ''}`,
                     onClick: () => goToChart(index),
-                    disabled: loading
+                    disabled: loading,
+                    'aria-label': `Показать ${chartTypes[index].label}`
                 })
             )
         ),
-        error && DomUtils.createElement('div', {
-            className: 'error-message',
-            style: {
-                marginTop: 'var(--space-4)', padding: 'var(--space-3)',
-                backgroundColor: '#f8d7da', color: '#721c24',
-                border: '1px solid #f5c6cb', borderRadius: 'var(--radius-md)',
-                fontSize: 'var(--text-sm)'
-            }
-        }, `⚠️ ${error}`),
-        DomUtils.createElement('div', {
-            style: {
-                marginTop: 'var(--space-3)', padding: 'var(--space-2) var(--space-3)',
-                backgroundColor: '#e8f5e8', color: '#155724',
-                border: '1px solid #c3e6cb', borderRadius: 'var(--radius-sm)',
-                fontSize: 'var(--text-xs)', textAlign: 'center',
-                display: 'flex', justifyContent: 'space-between',
-                alignItems: 'center'
-            }
-        },
-            DomUtils.createElement('span', null,
+
+        error && DomUtils.createElement('div', { className: 'error-message' },
+            `⚠️ ${error}`
+        ),
+
+        DomUtils.createElement('div', { className: 'chart-footer-info' },
+            DomUtils.createElement('span', { className: 'axis-info' },
                 timeInterval === 'hours' ? '⏰ На оси X отображается время (часы:минуты)' :
                 timeInterval === 'days' ? '📅 На оси X отображаются даты' :
                 '📆 На оси X отображаются месяцы'
             ),
-            chartData.metadata && chartData.metadata.generatedAt && DomUtils.createElement('span', {
-                style: { fontSize: '0.75em', opacity: 0.7 }
-            }, `Обновлено: ${new Date(chartData.metadata.generatedAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`)
+
+            chartData.metadata && chartData.metadata.generatedAt && DomUtils.createElement('span', { className: 'update-time' },
+                `Обновлено: ${new Date(chartData.metadata.generatedAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`
+            )
         )
     );
 };
