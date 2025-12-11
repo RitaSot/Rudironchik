@@ -536,28 +536,79 @@ const ChartContainerChartJS = () => {
                         gap: 'var(--space-1)'
                     }
                 }, DomUtils.createElement('span', null, '🔄'), 'Демо'),
-                !useDemoData && DomUtils.createElement('button', {
-                    onClick: testThingSpeakConnection,
-                    disabled: loading,
+
+                DomUtils.createElement('div', {
+                    className: 'data-actions',
                     style: {
-                        marginLeft: 'auto', padding: 'var(--space-2) var(--space-3)',
-                        backgroundColor: '#28a745', color: 'white', border: 'none',
-                        borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)',
-                        cursor: 'pointer', display: 'flex', alignItems: 'center',
-                        gap: 'var(--space-1)'
+                        marginLeft: 'auto',
+                        display: 'flex',
+                        gap: 'var(--space-2)',
+                        alignItems: 'center'
                     }
-                }, DomUtils.createElement('span', null, '🔍'), 'Проверить подключение'),
-                DomUtils.createElement('button', {
-                    onClick: refreshData,
-                    disabled: loading,
-                    style: {
-                        padding: 'var(--space-2) var(--space-3)',
-                        backgroundColor: '#17a2b8', color: 'white', border: 'none',
-                        borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)',
-                        cursor: 'pointer', display: 'flex', alignItems: 'center',
-                        gap: 'var(--space-1)'
-                    }
-                }, DomUtils.createElement('span', null, '🔄'), 'Обновить')
+                },
+                    !useDemoData && DomUtils.createElement('button', {
+                        onClick: testThingSpeakConnection,
+                        disabled: loading,
+                        className: 'test-connection-btn desktop-btn',
+                        style: {
+                            padding: 'var(--space-2) var(--space-3)',
+                            backgroundColor: '#28a745', color: 'white', border: 'none',
+                            borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)',
+                            cursor: 'pointer', display: 'flex', alignItems: 'center',
+                            gap: 'var(--space-1)', whiteSpace: 'nowrap'
+                        }
+                    }, DomUtils.createElement('span', null, '🔍'), 'Проверить подключение'),
+
+                    DomUtils.createElement('button', {
+                        onClick: refreshData,
+                        disabled: loading,
+                        className: 'refresh-btn desktop-btn',
+                        style: {
+                            padding: 'var(--space-2) var(--space-3)',
+                            backgroundColor: '#17a2b8', color: 'white', border: 'none',
+                            borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-sm)',
+                            cursor: 'pointer', display: 'flex', alignItems: 'center',
+                            gap: 'var(--space-1)', whiteSpace: 'nowrap'
+                        }
+                    }, DomUtils.createElement('span', null, '🔄'), 'Обновить'),
+
+                    DomUtils.createElement('div', {
+                        className: 'mobile-actions',
+                        style: {
+                            display: 'none',
+                            gap: 'var(--space-1)',
+                            alignItems: 'center'
+                        }
+                    },
+                        !useDemoData && DomUtils.createElement('button', {
+                            onClick: testThingSpeakConnection,
+                            disabled: loading,
+                            className: 'mobile-action-btn test-btn',
+                            style: {
+                                padding: 'var(--space-1)',
+                                backgroundColor: '#28a745', color: 'white', border: 'none',
+                                borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)',
+                                cursor: 'pointer', display: 'flex', alignItems: 'center',
+                                justifyContent: 'center', width: '32px', height: '32px'
+                            },
+                            title: 'Проверить подключение к ThingSpeak'
+                        }, DomUtils.createElement('span', null, '🔍')),
+
+                        DomUtils.createElement('button', {
+                            onClick: refreshData,
+                            disabled: loading,
+                            className: 'mobile-action-btn refresh-btn-mobile',
+                            style: {
+                                padding: 'var(--space-1)',
+                                backgroundColor: '#17a2b8', color: 'white', border: 'none',
+                                borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)',
+                                cursor: 'pointer', display: 'flex', alignItems: 'center',
+                                justifyContent: 'center', width: '32px', height: '32px'
+                            },
+                            title: 'Обновить данные'
+                        }, DomUtils.createElement('span', null, '🔄'))
+                    )
+                )
             ),
             DomUtils.createElement('div', {
                 className: 'data-info',

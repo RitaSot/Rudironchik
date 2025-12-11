@@ -95,6 +95,3 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
-
-/* ==================== ПЕРИОДИЧЕСКАЯ ПРОВЕРКА ==================== */
-setInterval(enforceLightTheme, 1000);

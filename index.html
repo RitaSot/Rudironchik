@@ -30,37 +30,6 @@
             color-scheme: light !important;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root, html, body {
-                color-scheme: light !important;
-            }
-
-            body {
-                background: linear-gradient(135deg, #45AEAC, #B0FAB4) !important;
-                color: #1a1a1a !important;
-            }
-
-            .charts-chartjs,
-            .chartjs-container,
-            .filters,
-            .carousel__item {
-                background: #ffffff !important;
-                border-color: #e9ecef !important;
-                color: #1a1a1a !important;
-            }
-
-            .charts__nav-btn {
-                background: #45AEAC !important;
-                color: #ffffff !important;
-                border: none !important;
-            }
-
-            .footer {
-                background: #1a1a1a !important;
-                color: #ffffff !important;
-            }
-        }
-
         #root:empty::after {
             content: '🔄 Загрузка приложения...';
             position: fixed;
