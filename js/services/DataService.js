@@ -254,7 +254,7 @@ class DataService {
             temperature: { base: 18, dailyAmplitude: 8, seasonalAmplitude: 12, trend: 0.02, noise: 0.5 },
             humidity: { base: 65, dailyAmplitude: 15, seasonalAmplitude: 10, trend: -0.01, noise: 2 },
             pressure: { base: 1013, dailyAmplitude: 5, seasonalAmplitude: 8, trend: 0.005, noise: 0.3 },
-            insolation: { base: 500, dailyAmplitude: 300, seasonalAmplitude: 200, trend: 0.03, noise: 50 }
+            insolation: { base: 5000, dailyAmplitude: 3000, seasonalAmplitude: 2000, trend: 0.03, noise: 200 }
         };
 
         const config = configs[type] || configs.temperature;
@@ -291,7 +291,7 @@ class DataService {
                     if (hour < 6 || hour > 20) {
                         value = Math.max(0, value * 0.1);
                     }
-                    value = Math.min(1200, value);
+                    value = Math.min(10000, value);
                     break;
             }
 

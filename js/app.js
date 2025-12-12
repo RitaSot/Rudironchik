@@ -95,29 +95,3 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
-/* ==================== ИНИЦИАЛИЗАЦИЯ ТЕМЫ ==================== */
-function initTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-
-    document.documentElement.setAttribute('data-theme', theme);
-    document.documentElement.style.colorScheme = theme;
-
-    updateThemeMeta(theme);
-
-    return theme;
-}
-
-function updateThemeMeta(theme) {
-    let themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (!themeColorMeta) {
-        themeColorMeta = document.createElement('meta');
-        themeColorMeta.name = 'theme-color';
-        document.head.appendChild(themeColorMeta);
-    }
-
-    themeColorMeta.content = theme === 'dark' ? '#121212' : '#45AEAC';
-}
-
-initTheme();
