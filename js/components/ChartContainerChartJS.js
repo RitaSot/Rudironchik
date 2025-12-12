@@ -17,7 +17,7 @@ const ChartContainerChartJS = () => {
         { id: 'temperature', label: 'Температура воздуха, °C', color: '#FF6B6B', gradient: ['#FF6B6B', '#FF8E8E'], unit: '°C' },
         { id: 'humidity', label: 'Относительная влажность, %', color: '#4ECDC4', gradient: ['#4ECDC4', '#6ED9D2'], unit: '%' },
         { id: 'pressure', label: 'Атмосферное давление, гПа', color: '#45B7D1', gradient: ['#45B7D1', '#65C7E1'], unit: 'гПа' },
-        { id: 'insolation', label: 'Коэффициент солнечной инсоляции, Вт/м²', color: '#FFD166', gradient: ['#FFD166', '#FFDF99'], unit: 'Вт/м²' }
+        { id: 'insolation', label: 'Коэффициент солнечной инсоляции, кВт/м²', color: '#FFD166', gradient: ['#FFD166', '#FFDF99'], unit: 'кВт/м²' }
     ], []);
 
     React.useEffect(() => {
@@ -32,11 +32,20 @@ const ChartContainerChartJS = () => {
             let data;
             const actualSource = useDemoData ? 'demo' : 'thingspeak';
 
-            if (window.DataService) {
+            console.log('🔍 Проверяем DataService:', window.DataService);
+
+            if (window.DataService && typeof window.DataService.getChartData === 'function') {
+                console.log('✅ DataService доступен');
                 window.DataService.setDataSource(actualSource);
 
                 try {
                     data = await window.DataService.getChartData(filters, timeInterval);
+                    console.log('📊 Данные получены:', {
+                        источник: data.metadata?.source,
+                        температура: data.temperature?.slice(0, 3),
+                        инсоляция: data.insolation?.slice(0, 3),
+                        метаданные: data.metadata
+                    });
                     setDataSource(data.metadata?.source || actualSource);
 
                     if (timeInterval === 'hours' && data.labels) {
@@ -55,7 +64,8 @@ const ChartContainerChartJS = () => {
                     }
                 }
             } else {
-                setError('DataService не загружен');
+                console.error('❌ DataService не загружен или некорректен');
+                setError('Сервис данных не загружен. Используем локальные демо-данные.');
                 data = await generateLocalDemoData();
                 setDataSource('local');
             }
@@ -212,7 +222,7 @@ const ChartContainerChartJS = () => {
             temperature: { min: 15, max: 25, daily: true },
             humidity: { min: 50, max: 80, daily: true },
             pressure: { min: 1005, max: 1025, daily: false },
-            insolation: { min: 100, max: 800, daily: true }
+            insolation: { min: 0.1, max: 0.8, daily: true }
         };
 
         const config = baseValues[type] || baseValues.temperature;
@@ -223,27 +233,68 @@ const ChartContainerChartJS = () => {
 
             if (interval === 'hours') {
                 const hour = i % 24;
-                const dailyCycle = Math.sin((hour - 6) * Math.PI / 12) * 0.5 + 0.5;
-                value = config.min + (dailyCycle * range);
 
                 if (type === 'insolation') {
-                    if (hour < 6 || hour > 20) {
-                        value = Math.max(0, config.min * 0.1);
-                    } else if (hour >= 10 && hour <= 16) {
-                        value = config.max * 0.9 + (config.max * 0.2 * Math.random());
+                    if (hour < 6 || hour >= 20) { // Ночь
+                        value = 0.01 + Math.random() * 0.03;
+                    } else if (hour >= 6 && hour < 9) {
+                        const progress = (hour - 6) / 3;
+                        value = 0.1 + progress * 0.3 + Math.random() * 0.1;
+                    } else if (hour >= 9 && hour < 12) {
+                        const progress = (hour - 9) / 3;
+                        value = 0.4 + progress * 0.3 + Math.random() * 0.1;
+                    } else if (hour >= 12 && hour < 15) {
+                        value = 0.7 + Math.random() * 0.15;
+                    } else if (hour >= 15 && hour < 18) {
+                        const progress = (hour - 15) / 3;
+                        value = 0.7 - progress * 0.3 + Math.random() * 0.1;
+                    } else {
+                        const progress = (hour - 18) / 2;
+                        value = 0.4 - progress * 0.36 + Math.random() * 0.05;
                     }
+                } else {
+                    const dailyCycle = Math.sin((hour - 6) * Math.PI / 12) * 0.5 + 0.5;
+                    value = config.min + (dailyCycle * range);
                 }
             } else if (interval === 'months') {
                 const month = i % 12;
-                const seasonalCycle = Math.sin((month - 3) * Math.PI / 6) * 0.3 + 0.7;
-                value = config.min + (seasonalCycle * range);
+
+                if (type === 'insolation') {
+                    if (month >= 11 || month <= 1) {
+                        value = 0.15 + Math.random() * 0.1;
+                    } else if (month >= 2 && month <= 4) {
+                        const progress = (month - 2) / 3;
+                        value = 0.25 + progress * 0.3 + Math.random() * 0.1;
+                    } else if (month >= 5 && month <= 7) {
+                        value = 0.55 + Math.random() * 0.2;
+                    } else {
+                        const progress = (month - 8) / 3;
+                        value = 0.75 - progress * 0.4 + Math.random() * 0.1;
+                    }
+                } else {
+                    const seasonalCycle = Math.sin((month - 3) * Math.PI / 6) * 0.3 + 0.7;
+                    value = config.min + (seasonalCycle * range);
+                }
             } else {
-                const dailyCycle = Math.sin(i * 0.2) * 0.3 + 0.7;
-                const noise = (Math.random() - 0.5) * range * 0.1;
-                value = config.min + (dailyCycle * range) + noise;
+                if (type === 'insolation') {
+                    const dayType = Math.random();
+                    if (dayType < 0.2) {
+                        value = 0.1 + Math.random() * 0.2;
+                    } else if (dayType < 0.5) {
+                        value = 0.3 + Math.random() * 0.3;
+                    } else {
+                        value = 0.6 + Math.random() * 0.2;
+                    }
+                } else {
+                    const dailyCycle = Math.sin(i * 0.2) * 0.3 + 0.7;
+                    const noise = (Math.random() - 0.5) * range * 0.1;
+                    value = config.min + (dailyCycle * range) + noise;
+                }
             }
 
-            value += (Math.random() - 0.5) * range * 0.05;
+            if (type !== 'insolation' || interval !== 'hours') {
+                value += (Math.random() - 0.5) * range * 0.05;
+            }
 
             switch(type) {
                 case 'temperature':
@@ -256,13 +307,18 @@ const ChartContainerChartJS = () => {
                     value = Math.max(980, Math.min(1040, value));
                     break;
                 case 'insolation':
-                    value = Math.max(0, Math.min(1200, value));
+                    value = Math.max(0, Math.min(1.0, value));
                     break;
             }
 
-            data.push(parseFloat(value.toFixed(2)));
+            if (type === 'insolation') {
+                data.push(parseFloat(value.toFixed(1)));
+            } else {
+                data.push(parseFloat(value.toFixed(2)));
+            }
         }
 
+        console.log(`Генерация ${type}: первые 3 значения`, data.slice(0, 3));
         return data;
     };
 
@@ -280,6 +336,12 @@ const ChartContainerChartJS = () => {
         const chartType = chartTypes[currentChartIndex];
         const data = chartData[chartType.id] || [];
         let labels = chartData.labels || [];
+
+        console.log(`📈 Рендер графика ${chartType.id}:`, {
+            данные: data.slice(0, 5),
+            метки: labels.slice(0, 5),
+            единицы: chartType.unit
+        });
 
         if (canvas.chart) {
             canvas.chart.destroy();
@@ -362,7 +424,7 @@ const ChartContainerChartJS = () => {
                         callbacks: {
                             label: (context) => {
                                 if (chartType.id === 'insolation') {
-                                    return `${context.parsed.y.toFixed(0)} Вт/м²`;
+                                    return `${context.parsed.y.toFixed(1)} кВт/м²`;
                                 }
                                 return `${context.parsed.y.toFixed(1)} ${chartType.unit}`;
                             },
@@ -383,13 +445,18 @@ const ChartContainerChartJS = () => {
                 },
                 scales: {
                     y: {
-                        beginAtZero: false,
+                        beginAtZero: chartType.id === 'insolation',
                         grid: { color: 'rgba(0, 0, 0, 0.05)' },
                         ticks: {
                             color: '#666666',
                             font: { size: 12, family: "'Segoe UI', sans-serif" },
                             padding: 10,
-                            callback: (value) => `${value.toFixed(1)} ${chartType.unit}`
+                            callback: (value) => {
+                                if (chartType.id === 'insolation') {
+                                    return `${value.toFixed(1)} кВт/м²`;
+                                }
+                                return `${value.toFixed(1)} ${chartType.unit}`;
+                            }
                         },
                         title: {
                             display: true,

@@ -165,7 +165,7 @@ class DataService {
             case 'months':
                 points = Math.min(Math.max(6, Math.ceil(daysDiff / 30)), 24);
                 break;
-            default: // days
+            default:
                 points = Math.min(Math.max(30, daysDiff), 90);
         }
 
@@ -253,7 +253,7 @@ class DataService {
             temperature: { base: 18, dailyAmplitude: 8, seasonalAmplitude: 12, trend: 0.02, noise: 0.5 },
             humidity: { base: 65, dailyAmplitude: 15, seasonalAmplitude: 10, trend: -0.01, noise: 2 },
             pressure: { base: 1013, dailyAmplitude: 5, seasonalAmplitude: 8, trend: 0.005, noise: 0.3 },
-            insolation: { base: 300, dailyAmplitude: 250, seasonalAmplitude: 200, trend: 0.03, noise: 20 }
+            insolation: { base: 0.4, dailyAmplitude: 0.3, seasonalAmplitude: 0.2, trend: 0.001, noise: 0.05 }
         };
 
         const config = configs[type] || configs.temperature;
@@ -276,27 +276,36 @@ class DataService {
 
             value += seasonal + daily + weekly + trend + noise;
 
-            switch(type) {
-                case 'temperature':
-                    value = Math.max(-30, Math.min(35, value));
-                    break;
-                case 'humidity':
-                    value = Math.max(20, Math.min(100, value));
-                    break;
-                case 'pressure':
-                    value = Math.max(950, Math.min(1050, value));
-                    break;
-                case 'insolation':
-                    if (hour < 6 || hour > 20) {
-                        value = Math.max(0, value * 0.1);
-                    }
-                    value = Math.min(1200, value);
-                    break;
+            if (type === 'insolation') {
+                if (hour < 6 || hour > 20) {
+                    value = Math.max(0, value * 0.1);
+                }
+                if (hour >= 10 && hour <= 16) {
+                    value = Math.min(1.0, value * 1.2);
+                }
+                value = Math.max(0, Math.min(1.2, value));
+            } else {
+                switch(type) {
+                    case 'temperature':
+                        value = Math.max(-30, Math.min(35, value));
+                        break;
+                    case 'humidity':
+                        value = Math.max(20, Math.min(100, value));
+                        break;
+                    case 'pressure':
+                        value = Math.max(950, Math.min(1050, value));
+                        break;
+                }
             }
 
-            data.push(parseFloat(value.toFixed(2)));
+            if (type === 'insolation') {
+                data.push(parseFloat(value.toFixed(3)));
+            } else {
+                data.push(parseFloat(value.toFixed(2)));
+            }
         }
 
+        console.log(`DataService: ${type} сгенерировано (первые 3)`, data.slice(0, 3));
         return data;
     }
 
@@ -353,12 +362,15 @@ class DataService {
                 const data = await response.json();
                 const channelName = data.channel?.name || 'Неизвестный канал';
                 const feeds = data.feeds || [];
+                const insolationValues = feeds.map(feed => feed.field4).filter(val => val);
+                console.log('ThingSpeak данные инсоляции:', insolationValues);
 
                 return {
                     success: true,
                     channelName: channelName,
                     lastUpdate: feeds[feeds.length - 1]?.created_at,
                     totalRecords: feeds.length,
+                    insolationValues: insolationValues.slice(0, 3),
                     message: 'ThingSpeak доступен'
                 };
             } else {
