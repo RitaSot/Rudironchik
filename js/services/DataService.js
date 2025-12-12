@@ -20,7 +20,8 @@ class DataService {
             temperature: 'field1',
             humidity: 'field2',
             pressure: 'field3',
-            insolation: 'field4'
+            insolation: 'field4',
+            pm25: 'field5'
         };
 
         this.MIN_POINTS = 5;
@@ -62,7 +63,7 @@ class DataService {
     hasEnoughData(data) {
         if (!data || !data.temperature) return false;
 
-        const fields = ['temperature', 'humidity', 'pressure', 'insolation'];
+        const fields = ['temperature', 'humidity', 'pressure', 'insolation', 'pm25'];
         let hasValidData = false;
 
         for (const field of fields) {
@@ -126,6 +127,7 @@ class DataService {
             humidity: [],
             pressure: [],
             insolation: [],
+            pm25: [],
             timestamps: [],
             metadata: {
                 period: this.formatPeriod(filters.startDate, filters.endDate),
@@ -146,6 +148,7 @@ class DataService {
             result.humidity.push(this.parseField(feed[this.fieldMapping.humidity]));
             result.pressure.push(this.parseField(feed[this.fieldMapping.pressure]));
             result.insolation.push(this.parseField(feed[this.fieldMapping.insolation]));
+            result.pm25.push(this.parseField(feed[this.fieldMapping.pm25]));
         }
 
         result.labels = this.generateLabelsFromTimestamps(result.timestamps, interval);
@@ -176,6 +179,7 @@ class DataService {
             humidity: this.generateRealisticData(points, 'humidity', interval, timestamps),
             pressure: this.generateRealisticData(points, 'pressure', interval, timestamps),
             insolation: this.generateRealisticData(points, 'insolation', interval, timestamps),
+            pm25: this.generateRealisticData(points, 'pm25', interval, timestamps),
             labels: labels,
             timestamps: timestamps,
             metadata: {
@@ -249,11 +253,13 @@ class DataService {
 
     generateRealisticData(points, type, interval, timestamps) {
         const data = [];
+
         const configs = {
             temperature: { base: 18, dailyAmplitude: 8, seasonalAmplitude: 12, trend: 0.02, noise: 0.5 },
             humidity: { base: 65, dailyAmplitude: 15, seasonalAmplitude: 10, trend: -0.01, noise: 2 },
             pressure: { base: 1013, dailyAmplitude: 5, seasonalAmplitude: 8, trend: 0.005, noise: 0.3 },
-            insolation: { base: 0.4, dailyAmplitude: 0.3, seasonalAmplitude: 0.2, trend: 0.001, noise: 0.05 }
+            insolation: { base: 0.4, dailyAmplitude: 0.3, seasonalAmplitude: 0.2, trend: 0.001, noise: 0.05 },
+            pm25: { base: 15, dailyAmplitude: 10, seasonalAmplitude: 15, trend: 0.01, noise: 3 }
         };
 
         const config = configs[type] || configs.temperature;
@@ -284,6 +290,14 @@ class DataService {
                     value = Math.min(1.0, value * 1.2);
                 }
                 value = Math.max(0, Math.min(1.2, value));
+            } else if (type === 'pm25') {
+                if ((hour >= 7 && hour <= 10) || (hour >= 17 && hour <= 20)) {
+                    value *= 1.5;
+                }
+                if (month >= 11 || month <= 1) {
+                    value *= 1.3;
+                }
+                value = Math.max(0, Math.min(80, value));
             } else {
                 switch(type) {
                     case 'temperature':
@@ -362,15 +376,12 @@ class DataService {
                 const data = await response.json();
                 const channelName = data.channel?.name || 'Неизвестный канал';
                 const feeds = data.feeds || [];
-                const insolationValues = feeds.map(feed => feed.field4).filter(val => val);
-                console.log('ThingSpeak данные инсоляции:', insolationValues);
 
                 return {
                     success: true,
                     channelName: channelName,
                     lastUpdate: feeds[feeds.length - 1]?.created_at,
                     totalRecords: feeds.length,
-                    insolationValues: insolationValues.slice(0, 3),
                     message: 'ThingSpeak доступен'
                 };
             } else {

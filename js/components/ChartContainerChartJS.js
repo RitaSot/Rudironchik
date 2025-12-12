@@ -17,7 +17,8 @@ const ChartContainerChartJS = () => {
         { id: 'temperature', label: 'Температура воздуха, °C', color: '#FF6B6B', gradient: ['#FF6B6B', '#FF8E8E'], unit: '°C' },
         { id: 'humidity', label: 'Относительная влажность, %', color: '#4ECDC4', gradient: ['#4ECDC4', '#6ED9D2'], unit: '%' },
         { id: 'pressure', label: 'Атмосферное давление, гПа', color: '#45B7D1', gradient: ['#45B7D1', '#65C7E1'], unit: 'гПа' },
-        { id: 'insolation', label: 'Коэффициент солнечной инсоляции, кВт/м²', color: '#FFD166', gradient: ['#FFD166', '#FFDF99'], unit: 'кВт/м²' }
+        { id: 'insolation', label: 'Коэффициент солнечной инсоляции, кВт/м²', color: '#FFD166', gradient: ['#FFD166', '#FFDF99'], unit: 'кВт/м²' },
+        { id: 'pm25', label: 'Концентрация PM2.5, мкг/м³', color: '#9D4EDD', gradient: ['#9D4EDD', '#B667F0'], unit: 'мкг/м³' }
     ], []);
 
     React.useEffect(() => {
@@ -44,6 +45,7 @@ const ChartContainerChartJS = () => {
                         источник: data.metadata?.source,
                         температура: data.temperature?.slice(0, 3),
                         инсоляция: data.insolation?.slice(0, 3),
+                        pm25: data.pm25?.slice(0, 3),
                         метаданные: data.metadata
                     });
                     setDataSource(data.metadata?.source || actualSource);
@@ -165,6 +167,7 @@ const ChartContainerChartJS = () => {
             humidity: generateRealisticSeries(points, 'humidity', timeInterval),
             pressure: generateRealisticSeries(points, 'pressure', timeInterval),
             insolation: generateRealisticSeries(points, 'insolation', timeInterval),
+            pm25: generateRealisticSeries(points, 'pm25', timeInterval),
             labels: labels,
             metadata: {
                 source: 'local_demo',
@@ -218,11 +221,13 @@ const ChartContainerChartJS = () => {
 
     const generateRealisticSeries = (points, type, interval) => {
         const data = [];
+
         const baseValues = {
             temperature: { min: 15, max: 25, daily: true },
             humidity: { min: 50, max: 80, daily: true },
             pressure: { min: 1005, max: 1025, daily: false },
-            insolation: { min: 0.1, max: 0.8, daily: true }
+            insolation: { min: 0.1, max: 0.8, daily: true },
+            pm25: { min: 5, max: 35, daily: true }
         };
 
         const config = baseValues[type] || baseValues.temperature;
@@ -235,7 +240,7 @@ const ChartContainerChartJS = () => {
                 const hour = i % 24;
 
                 if (type === 'insolation') {
-                    if (hour < 6 || hour >= 20) { // Ночь
+                    if (hour < 6 || hour >= 20) {
                         value = 0.01 + Math.random() * 0.03;
                     } else if (hour >= 6 && hour < 9) {
                         const progress = (hour - 6) / 3;
@@ -251,6 +256,16 @@ const ChartContainerChartJS = () => {
                     } else {
                         const progress = (hour - 18) / 2;
                         value = 0.4 - progress * 0.36 + Math.random() * 0.05;
+                    }
+                } else if (type === 'pm25') {
+                    if (hour >= 7 && hour <= 10) {
+                        value = 25 + Math.random() * 15;
+                    } else if (hour >= 17 && hour <= 20) {
+                        value = 20 + Math.random() * 15;
+                    } else if (hour >= 22 || hour <= 5) {
+                        value = 8 + Math.random() * 7;
+                    } else {
+                        value = 10 + Math.random() * 10;
                     }
                 } else {
                     const dailyCycle = Math.sin((hour - 6) * Math.PI / 12) * 0.5 + 0.5;
@@ -271,6 +286,14 @@ const ChartContainerChartJS = () => {
                         const progress = (month - 8) / 3;
                         value = 0.75 - progress * 0.4 + Math.random() * 0.1;
                     }
+                } else if (type === 'pm25') {
+                    if (month >= 11 || month <= 1) {
+                        value = 20 + Math.random() * 20;
+                    } else if (month >= 5 && month <= 8) {
+                        value = 10 + Math.random() * 10;
+                    } else {
+                        value = 15 + Math.random() * 15;
+                    }
                 } else {
                     const seasonalCycle = Math.sin((month - 3) * Math.PI / 6) * 0.3 + 0.7;
                     value = config.min + (seasonalCycle * range);
@@ -284,6 +307,15 @@ const ChartContainerChartJS = () => {
                         value = 0.3 + Math.random() * 0.3;
                     } else {
                         value = 0.6 + Math.random() * 0.2;
+                    }
+                } else if (type === 'pm25') {
+                    const pollutionLevel = Math.random();
+                    if (pollutionLevel < 0.1) {
+                        value = 35 + Math.random() * 15;
+                    } else if (pollutionLevel < 0.3) {
+                        value = 20 + Math.random() * 15;
+                    } else {
+                        value = 5 + Math.random() * 15;
                     }
                 } else {
                     const dailyCycle = Math.sin(i * 0.2) * 0.3 + 0.7;
@@ -309,10 +341,13 @@ const ChartContainerChartJS = () => {
                 case 'insolation':
                     value = Math.max(0, Math.min(1.0, value));
                     break;
+                case 'pm25':
+                    value = Math.max(0, Math.min(80, value));
+                    break;
             }
 
             if (type === 'insolation') {
-                data.push(parseFloat(value.toFixed(1)));
+                data.push(parseFloat(value.toFixed(3)));
             } else {
                 data.push(parseFloat(value.toFixed(2)));
             }
@@ -424,7 +459,15 @@ const ChartContainerChartJS = () => {
                         callbacks: {
                             label: (context) => {
                                 if (chartType.id === 'insolation') {
-                                    return `${context.parsed.y.toFixed(1)} кВт/м²`;
+                                    return `${context.parsed.y.toFixed(3)} кВт/м²`;
+                                } else if (chartType.id === 'pm25') {
+                                    const value = context.parsed.y;
+                                    let quality = '';
+                                    if (value <= 15) quality = ' (хорошо)';
+                                    else if (value <= 25) quality = ' (удовл.)';
+                                    else if (value <= 50) quality = ' (плохо)';
+                                    else quality = ' (очень плохо)';
+                                    return `${value.toFixed(1)} мкг/м³${quality}`;
                                 }
                                 return `${context.parsed.y.toFixed(1)} ${chartType.unit}`;
                             },
@@ -445,7 +488,7 @@ const ChartContainerChartJS = () => {
                 },
                 scales: {
                     y: {
-                        beginAtZero: chartType.id === 'insolation',
+                        beginAtZero: chartType.id === 'insolation' || chartType.id === 'pm25',
                         grid: { color: 'rgba(0, 0, 0, 0.05)' },
                         ticks: {
                             color: '#666666',
@@ -453,7 +496,9 @@ const ChartContainerChartJS = () => {
                             padding: 10,
                             callback: (value) => {
                                 if (chartType.id === 'insolation') {
-                                    return `${value.toFixed(1)} кВт/м²`;
+                                    return `${value.toFixed(3)} кВт/м²`;
+                                } else if (chartType.id === 'pm25') {
+                                    return `${value.toFixed(0)} мкг/м³`;
                                 }
                                 return `${value.toFixed(1)} ${chartType.unit}`;
                             }

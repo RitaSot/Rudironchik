@@ -19,6 +19,11 @@ const ChartUtils = {
             line: '#FFD166',
             area: 'rgba(255, 209, 102, 0.3)',
             gradient: ['#FFD166', '#FFDF99']
+        },
+        pm25: {
+            line: '#9D4EDD',
+            area: 'rgba(157, 78, 221, 0.3)',
+            gradient: ['#9D4EDD', '#B667F0']
         }
     },
 
