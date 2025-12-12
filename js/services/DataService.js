@@ -26,7 +26,7 @@ class DataService {
         this.MIN_POINTS = 5;
     }
 
-    async getChartData(filters, interval = 'auto') {
+    async getChartData(filters, interval = 'days') {
         const cacheKey = this.getCacheKey(filters, interval);
         const cached = this.cache.get(cacheKey);
 
@@ -128,7 +128,6 @@ class DataService {
             insolation: [],
             timestamps: [],
             metadata: {
-                region: 'ThingSpeak Channel #' + this.thingSpeakConfig.channelId,
                 period: this.formatPeriod(filters.startDate, filters.endDate),
                 generatedAt: new Date().toISOString(),
                 source: 'thingspeak',
@@ -166,7 +165,7 @@ class DataService {
             case 'months':
                 points = Math.min(Math.max(6, Math.ceil(daysDiff / 30)), 24);
                 break;
-            default:
+            default: // days
                 points = Math.min(Math.max(30, daysDiff), 90);
         }
 
@@ -254,7 +253,7 @@ class DataService {
             temperature: { base: 18, dailyAmplitude: 8, seasonalAmplitude: 12, trend: 0.02, noise: 0.5 },
             humidity: { base: 65, dailyAmplitude: 15, seasonalAmplitude: 10, trend: -0.01, noise: 2 },
             pressure: { base: 1013, dailyAmplitude: 5, seasonalAmplitude: 8, trend: 0.005, noise: 0.3 },
-            insolation: { base: 5000, dailyAmplitude: 3000, seasonalAmplitude: 2000, trend: 0.03, noise: 200 }
+            insolation: { base: 300, dailyAmplitude: 250, seasonalAmplitude: 200, trend: 0.03, noise: 20 }
         };
 
         const config = configs[type] || configs.temperature;
@@ -291,7 +290,7 @@ class DataService {
                     if (hour < 6 || hour > 20) {
                         value = Math.max(0, value * 0.1);
                     }
-                    value = Math.min(10000, value);
+                    value = Math.min(1200, value);
                     break;
             }
 
@@ -384,26 +383,6 @@ class DataService {
         } catch (error) {
             return { success: false, error: error.message };
         }
-    }
-
-    async quickTest() {
-        const connection = await this.testThingSpeakConnection();
-        console.log('📡 Подключение к ThingSpeak:', connection.success ? '✅ OK' : '❌ FAILED');
-
-        const demoFilters = {
-            startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-            endDate: new Date()
-        };
-
-        try {
-            const demoData = await this.fetchDemoData(demoFilters, 'days');
-            console.log('✅ Демо-данные сгенерированы:');
-            console.log('  Меток:', demoData.labels?.length || 0);
-        } catch (error) {
-            console.error('❌ Ошибка генерации демо-данных:', error);
-        }
-
-        return { connection };
     }
 }
 

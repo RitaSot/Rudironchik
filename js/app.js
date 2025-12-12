@@ -1,95 +1,58 @@
-/* ==================== СВЕТЛАЯ ТЕМА ==================== */
-document.documentElement.setAttribute('data-theme', 'light');
-document.documentElement.style.colorScheme = 'light';
-document.body.classList.add('light-theme');
-
-function enforceLightTheme() {
-    document.documentElement.style.colorScheme = 'light';
-    document.body.classList.remove('dark', 'dark-theme', 'dark-mode');
-    document.body.classList.add('light-theme');
-
-    const themeColorMeta = document.querySelector('meta[name="theme-color"]') ||
-        (() => {
-            const meta = document.createElement('meta');
-            meta.name = 'theme-color';
-            document.head.appendChild(meta);
-            return meta;
-        })();
-    themeColorMeta.content = '#45AEAC';
-}
-
-/* ==================== ПРИЛОЖЕНИЕ ==================== */
 const App = () => {
     const scrollToSection = React.useCallback((sectionId) => {
-        DomUtils.scrollToElement(sectionId, 80);
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }, []);
 
-    return DomUtils.createElement('div', { className: 'app' },
-        DomUtils.createElement(Header),
-
-        DomUtils.createElement('main', { className: 'app__main' },
-            DomUtils.createElement('div', { className: 'container' },
-                DomUtils.createElement('button', {
+    return React.createElement('div', { className: 'app' },
+        React.createElement(window.Header),
+        React.createElement('main', { className: 'app__main' },
+            React.createElement('div', { className: 'container' },
+                React.createElement('button', {
                     className: 'btn btn--primary btn--full mb-4',
                     onClick: () => scrollToSection('graphics')
                 }, 'К графикам'),
-
-                DomUtils.createElement('button', {
+                React.createElement('button', {
                     className: 'btn btn--secondary btn--full mb-6',
                     onClick: () => scrollToSection('team')
                 }, 'О нас'),
-
-                DomUtils.createElement('hr', { className: 'divider' }),
-
-                DomUtils.createElement('section', { id: 'graphics' },
-                    DomUtils.createElement(ChartContainerChartJS)
+                React.createElement('hr', { className: 'divider' }),
+                React.createElement('section', { id: 'graphics' },
+                    React.createElement(window.ChartContainerChartJS)
                 ),
-
-                DomUtils.createElement('hr', { className: 'divider' }),
-
-                DomUtils.createElement('section', { id: 'team' },
-                    DomUtils.createElement('h2', { className: 'section-title' },
-                        'Участники проекта'
-                    ),
-                    DomUtils.createElement(TeamCarousel)
+                React.createElement('hr', { className: 'divider' }),
+                React.createElement('section', { id: 'team' },
+                    React.createElement('h2', { className: 'section-title' }, 'Участники проекта'),
+                    React.createElement(window.TeamCarousel)
                 )
             )
         ),
-
-        DomUtils.createElement(Footer)
+        React.createElement(window.Footer)
     );
 };
 
-/* ==================== ИНИЦИАЛИЗАЦИЯ ==================== */
 const initApp = () => {
     try {
-        enforceLightTheme();
-        DomUtils.setupLazyLoading();
-
         ReactDOM.render(
-            DomUtils.createElement(App),
+            React.createElement(App),
             document.getElementById('root')
         );
-
-        console.log('Приложение запущено');
-
     } catch (error) {
         console.error('Ошибка инициализации:', error);
-
         document.getElementById('root').innerHTML = `
-            <div style="padding: 3rem; text-align: center; background: white; color: #1a1a1a;">
-                <h2 style="margin-bottom: 1rem;">⚠️ Ошибка</h2>
-                <p style="margin-bottom: 1.5rem;">При загрузке приложения возникла проблема.</p>
-                <button onclick="window.location.reload()"
-                        style="padding: 0.75rem 1.5rem; background: #45AEAC; color: white; border: none; border-radius: 0.5rem; cursor: pointer;">
-                    Обновить страницу
+            <div style="padding:3rem;text-align:center">
+                <h2 style="margin-bottom:1rem">⚠️ Ошибка загрузки</h2>
+                <p style="margin-bottom:1.5rem">Пожалуйста, обновите страницу</p>
+                <button onclick="window.location.reload()" style="padding:.75rem 1.5rem;background:#45AEAC;color:white;border:none;border-radius:.5rem;cursor:pointer">
+                    Обновить
                 </button>
             </div>
         `;
     }
 };
 
-/* ==================== ЗАПУСК ==================== */
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initApp);
 } else {
