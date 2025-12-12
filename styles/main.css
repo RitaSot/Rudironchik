@@ -25,31 +25,88 @@ body {
     -moz-osx-font-smoothing: grayscale;
     color: var(--primary);
 
-    background: var(--bg-gradient);
+    background: linear-gradient(180deg,
+        var(--secondary) 0%,
+        var(--secondary) 180px,
+        color-mix(in srgb, var(--secondary) 85%, var(--accent) 15%) 220px,
+        color-mix(in srgb, var(--secondary) 70%, var(--accent) 30%) 280px,
+        color-mix(in srgb, var(--secondary) 50%, var(--accent) 50%) 400px,
+        color-mix(in srgb, var(--secondary) 30%, var(--accent) 70%) 600px,
+        var(--accent) calc(100% - 80px)
+    );
+
+    background: linear-gradient(180deg,
+        #45AEAC 0%,
+        #45AEAC 180px,
+        #58B7AC 220px,
+        #6BC0AD 280px,
+        #7EC9AE 400px,
+        #91D2AF 600px,
+        #B0FAB4 calc(100% - 80px)
+    );
+
     background-attachment: fixed;
     background-repeat: no-repeat;
-    background-size: cover;
-
-    background: #45AEAC;
-    background: -webkit-linear-gradient(135deg, #45AEAC, #B0FAB4);
-    background: -moz-linear-gradient(135deg, #45AEAC, #B0FAB4);
-    background: -o-linear-gradient(135deg, #45AEAC, #B0FAB4);
-    background: linear-gradient(135deg, #45AEAC, #B0FAB4);
+    background-size: 100% 100%;
 }
 
-@media (max-width: 768px) {
-    html, body {
-        height: auto;
-        min-height: 100vh;
-        background-attachment: scroll;
+/* ==================== ХЕДЕР ==================== */
+.header {
+    background: linear-gradient(135deg, var(--secondary), color-mix(in srgb, var(--secondary) 85%, var(--accent) 15%));
+    position: relative;
+    padding: var(--space-8) 0;
+    margin: 0;
+    z-index: 20;
+    overflow: hidden;
+}
 
-        background: linear-gradient(135deg, #45AEAC, #B0FAB4) !important;
-        -webkit-background-size: cover !important;
-        -moz-background-size: cover !important;
-        -o-background-size: cover !important;
-        background-size: cover !important;
-        background-repeat: no-repeat !important;
-    }
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--secondary), color-mix(in srgb, var(--secondary) 85%, var(--accent) 15%));
+    z-index: 1;
+}
+
+.header .container {
+    position: relative;
+    z-index: 10;
+}
+
+.header__title,
+.header__subtitle {
+    position: relative;
+    z-index: 20;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header__title {
+    color: white;
+}
+
+.header__subtitle {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.section-title {
+    color: var(--primary);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    margin-bottom: var(--space-8);
+    position: relative;
+    text-align: center;
+}
+
+.section-title::after {
+    content: '';
+    display: block;
+    width: 4rem;
+    height: 0.25rem;
+    background: var(--secondary);
+    margin: var(--space-5) auto;
+    border-radius: 0.125rem;
 }
 
 /* ==================== КОНТЕЙНЕРЫ ==================== */
@@ -58,18 +115,37 @@ body {
     display: flex;
     flex-direction: column;
     background: transparent;
-}
-
-.app__main {
-    flex: 1;
-    padding: var(--space-6) 0;
-    background: transparent;
+    position: relative;
 }
 
 .container {
     max-width: 80rem;
     margin: 0 auto;
     padding: 0 var(--space-4);
+    position: relative;
+}
+
+.app__main {
+    flex: 1;
+    padding: var(--space-8) 0 var(--space-6);
+    position: relative;
+    z-index: 5;
+    background: transparent;
+}
+
+.charts-chartjs,
+.interval-filters,
+.data-control-panel,
+.chartjs-container,
+.filters,
+.carousel__item {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-xl);
 }
 
 /* ==================== КНОПКИ ==================== */
@@ -100,6 +176,7 @@ body {
     touch-action: manipulation;
     gap: var(--space-2);
     overflow: hidden;
+    z-index: 10;
 }
 
 .btn--primary {
@@ -132,25 +209,42 @@ body {
     font-size: var(--text-lg);
 }
 
-/* ==================== ПОДВАЛ ==================== */
 .footer {
-    background: var(--primary);
-    color: var(--gray-300);
+    background: var(--primary) !important;
+    color: var(--gray-300) !important;
     padding: var(--space-6) 0;
     text-align: center;
     margin-top: auto;
+    position: relative;
+    z-index: 10;
+    border: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
 }
 
 .footer__text {
     font-size: var(--text-sm);
-    opacity: 0.8;
+    color: var(--gray-300) !important;
+    opacity: 0.9;
+}
+
+.footer .container,
+.footer p,
+.footer span,
+.footer div {
+    color: var(--gray-300) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* ==================== УТИЛИТЫ ==================== */
 .divider {
     border: none;
     height: 1px;
-    background: linear-gradient(to right, transparent, var(--gray-500), transparent);
+    background: linear-gradient(to right,
+        transparent,
+        rgba(108, 117, 125, 0.3),
+        transparent
+    );
     margin: var(--space-8) 0;
 }
 
@@ -192,13 +286,33 @@ body {
 
 /* ==================== АДАПТИВНОСТЬ ==================== */
 @media (max-width: 768px) {
-    html, body {
-        background: linear-gradient(135deg, #45AEAC, #B0FAB4) !important;
-        background-attachment: scroll !important;
+    body {
+        background: linear-gradient(180deg,
+            var(--secondary) 0%,
+            var(--secondary) 120px,
+            color-mix(in srgb, var(--secondary) 85%, var(--accent) 15%) 160px,
+            var(--accent) calc(100% - 60px)
+        ) !important;
     }
 
-    .app, .app__main {
-        background: transparent !important;
+    .header {
+        padding: var(--space-6) 0;
+    }
+
+    .header__title {
+        font-size: var(--text-xl);
+    }
+
+    .header__subtitle {
+        font-size: var(--text-sm);
+    }
+
+    .section-title::after {
+        margin: var(--space-4) auto;
+    }
+
+    .app__main {
+        padding: var(--space-6) 0 var(--space-4);
     }
 
     .container {
@@ -221,6 +335,10 @@ body {
     .btn--full {
         padding: var(--space-4) 0;
         font-size: var(--text-base);
+    }
+
+    .footer {
+        padding: var(--space-4) 0;
     }
 }
 
@@ -253,26 +371,19 @@ body {
     }
 }
 
-/* ==================== ДОПОЛНИТЕЛЬНЫЕ ФИКСЫ ==================== */
-.header,
-.charts-chartjs,
-.interval-filters,
-.data-control-panel,
-.chartjs-container,
-.filters,
-.carousel__item {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px);
-}
-
+h1, h2, h3, h4, h5, h6,
 .section-title,
-.header__title,
-.header__subtitle,
 .charts__title,
 .carousel__name {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    color: var(--primary);
+    font-weight: 700;
 }
 
-p, span, div, li {
-    color: var(--primary);
+p, span, li, .text-content {
+    color: rgba(26, 26, 26, 0.95);
+}
+
+.footer,
+.footer * {
+    color: #e9ecef !important;
 }
