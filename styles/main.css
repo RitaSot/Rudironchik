@@ -10,9 +10,12 @@
 /* ==================== БАЗОВЫЕ СТИЛИ ==================== */
 html, body {
     min-height: 100vh;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    transition: background-color var(--transition-base), color var(--transition-base);
+    min-height: -webkit-fill-available;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
 }
 
 body {
@@ -20,17 +23,33 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    color: var(--primary);
+
+    background: var(--bg-gradient);
     background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    background: #45AEAC;
+    background: -webkit-linear-gradient(135deg, #45AEAC, #B0FAB4);
+    background: -moz-linear-gradient(135deg, #45AEAC, #B0FAB4);
+    background: -o-linear-gradient(135deg, #45AEAC, #B0FAB4);
+    background: linear-gradient(135deg, #45AEAC, #B0FAB4);
 }
 
-@media (prefers-color-scheme: light) {
-    [data-theme="light"] body {
-        background: var(--bg-gradient);
+@media (max-width: 768px) {
+    html, body {
+        height: auto;
+        min-height: 100vh;
+        background-attachment: scroll;
+
+        background: linear-gradient(135deg, #45AEAC, #B0FAB4) !important;
+        -webkit-background-size: cover !important;
+        -moz-background-size: cover !important;
+        -o-background-size: cover !important;
+        background-size: cover !important;
+        background-repeat: no-repeat !important;
     }
-}
-
-[data-theme="dark"] body {
-    background: var(--bg-primary);
 }
 
 /* ==================== КОНТЕЙНЕРЫ ==================== */
@@ -38,11 +57,13 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background: transparent;
 }
 
 .app__main {
     flex: 1;
     padding: var(--space-6) 0;
+    background: transparent;
 }
 
 .container {
@@ -118,7 +139,6 @@ body {
     padding: var(--space-6) 0;
     text-align: center;
     margin-top: auto;
-    transition: background-color var(--transition-base);
 }
 
 .footer__text {
@@ -170,34 +190,17 @@ body {
     border-radius: inherit;
 }
 
-/* ==================== ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ ==================== */
-.theme-toggle {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--secondary);
-    color: white;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    z-index: 1000;
-    box-shadow: var(--shadow-lg);
-    transition: all var(--transition-base);
-}
-
-.theme-toggle:hover {
-    transform: scale(1.1);
-    box-shadow: var(--shadow-lg);
-}
-
 /* ==================== АДАПТИВНОСТЬ ==================== */
-@media (max-width: 48rem) {
+@media (max-width: 768px) {
+    html, body {
+        background: linear-gradient(135deg, #45AEAC, #B0FAB4) !important;
+        background-attachment: scroll !important;
+    }
+
+    .app, .app__main {
+        background: transparent !important;
+    }
+
     .container {
         padding: 0 var(--space-3);
     }
@@ -213,6 +216,17 @@ body {
     .carousel__item {
         min-height: 20rem;
         padding: var(--space-4);
+    }
+
+    .btn--full {
+        padding: var(--space-4) 0;
+        font-size: var(--text-base);
+    }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+    .container {
+        padding: 0 var(--space-4);
     }
 }
 
@@ -237,4 +251,28 @@ body {
     .filters__main {
         grid-template-columns: repeat(3, 1fr);
     }
-}}
+}
+
+/* ==================== ДОПОЛНИТЕЛЬНЫЕ ФИКСЫ ==================== */
+.header,
+.charts-chartjs,
+.interval-filters,
+.data-control-panel,
+.chartjs-container,
+.filters,
+.carousel__item {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+}
+
+.section-title,
+.header__title,
+.header__subtitle,
+.charts__title,
+.carousel__name {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+p, span, div, li {
+    color: var(--primary);
+}
