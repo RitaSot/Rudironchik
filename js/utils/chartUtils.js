@@ -60,19 +60,19 @@ const ChartUtils = {
                 temperature: { base: 18, range: 15, trend: 0.1, seasonal: 0.3 },
                 humidity: { base: 65, range: 20, trend: -0.05, seasonal: 0.2 },
                 pressure: { base: 1013, range: 10, trend: 0.02, seasonal: 0.1 },
-                insolation: { base: 5000, range: 3000, trend: 0.15, seasonal: 0.4 }
+                insolation: { base: 400, range: 300, trend: 0.15, seasonal: 0.4 }
             },
             'Санкт-Петербург': {
                 temperature: { base: 15, range: 12, trend: 0.08, seasonal: 0.25 },
                 humidity: { base: 75, range: 15, trend: -0.03, seasonal: 0.15 },
                 pressure: { base: 1010, range: 12, trend: 0.01, seasonal: 0.08 },
-                insolation: { base: 3500, range: 2500, trend: 0.12, seasonal: 0.35 }
+                insolation: { base: 300, range: 250, trend: 0.12, seasonal: 0.35 }
             },
             'Краснодарский край': {
                 temperature: { base: 22, range: 10, trend: 0.12, seasonal: 0.35 },
                 humidity: { base: 60, range: 25, trend: -0.08, seasonal: 0.25 },
                 pressure: { base: 1015, range: 8, trend: 0.03, seasonal: 0.12 },
-                insolation: { base: 7000, range: 2000, trend: 0.18, seasonal: 0.45 }
+                insolation: { base: 700, range: 300, trend: 0.18, seasonal: 0.45 }
             }
         };
 
@@ -87,6 +87,12 @@ const ChartUtils = {
                 const hour = i % 24;
                 const dailyCycle = Math.sin((hour - 6) * Math.PI / 12);
                 value = config.base + (dailyCycle * config.range) + (Math.random() - 0.5) * config.range * 0.1;
+
+                if (type === 'insolation') {
+                    if (hour < 6 || hour > 20) {
+                        value = Math.max(0, value * 0.1);
+                    }
+                }
             } else if (interval === 'months') {
                 const month = i % 12;
                 const seasonalCycle = Math.sin((month - 3) * Math.PI / 6);
@@ -108,7 +114,7 @@ const ChartUtils = {
                     value = Math.min(Math.max(value, 950), 1050);
                     break;
                 case 'insolation':
-                    value = Math.max(0, value);
+                    value = Math.max(0, Math.min(value, 1200));
                     break;
             }
 
@@ -168,7 +174,120 @@ const ChartUtils = {
         });
 
         return gridLines;
+    },
+
+    getChartLabel(type) {
+        const labels = {
+            temperature: 'Температура воздуха, °C',
+            humidity: 'Относительная влажность, %',
+            pressure: 'Атмосферное давление, гПа',
+            insolation: 'Коэффициент солнечной инсоляции, Вт/м²'
+        };
+        return labels[type] || 'Неизвестный параметр';
+    },
+
+    getChartUnit(type) {
+        const units = {
+            temperature: '°C',
+            humidity: '%',
+            pressure: 'гПа',
+            insolation: 'Вт/м²'
+        };
+        return units[type] || '';
+    },
+
+    formatValue(value, type) {
+        switch (type) {
+            case 'temperature':
+            case 'insolation':
+                return `${value.toFixed(1)} ${this.getChartUnit(type)}`;
+            case 'humidity':
+            case 'pressure':
+                return `${Math.round(value)} ${this.getChartUnit(type)}`;
+            default:
+                return value.toFixed(1);
+        }
+    },
+
+    getRealisticValueRange(type, region = 'Москва') {
+        const ranges = {
+            'Москва': {
+                temperature: { min: -15, max: 30, typical: 18 },
+                humidity: { min: 40, max: 90, typical: 65 },
+                pressure: { min: 980, max: 1030, typical: 1013 },
+                insolation: { min: 50, max: 900, typical: 400 }
+            },
+            'Санкт-Петербург': {
+                temperature: { min: -20, max: 25, typical: 15 },
+                humidity: { min: 50, max: 95, typical: 75 },
+                pressure: { min: 975, max: 1025, typical: 1010 },
+                insolation: { min: 30, max: 700, typical: 300 }
+            },
+            'Краснодарский край': {
+                temperature: { min: -5, max: 35, typical: 22 },
+                humidity: { min: 35, max: 85, typical: 60 },
+                pressure: { min: 990, max: 1040, typical: 1015 },
+                insolation: { min: 100, max: 1100, typical: 700 }
+            }
+        };
+
+        const regionRanges = ranges[region] || ranges['Москва'];
+        return regionRanges[type] || { min: 0, max: 100, typical: 50 };
+    },
+
+    createTooltipContent(value, type, timestamp = null) {
+        const label = this.getChartLabel(type);
+        const formattedValue = this.formatValue(value, type);
+
+        let content = `<strong>${label}</strong><br>`;
+        content += `Значение: <strong>${formattedValue}</strong>`;
+
+        if (timestamp) {
+            const date = new Date(timestamp);
+            const timeStr = date.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const dateStr = date.toLocaleDateString('ru-RU');
+            content += `<br>Время: ${timeStr}<br>Дата: ${dateStr}`;
+        }
+
+        return content;
+    },
+
+    getChartColors(type) {
+        return this.colors[type] || {
+            line: '#45AEAC',
+            area: 'rgba(69, 174, 172, 0.3)',
+            gradient: ['#45AEAC', '#65BEBC']
+        };
+    },
+
+    isValidInsolationValue(value) {
+        return !isNaN(value) && value >= 0 && value <= 2000;
+    },
+
+    normalizeInsolationValue(value, hour = 12) {
+        let normalized = parseFloat(value);
+
+        if (isNaN(normalized)) {
+            return 0;
+        }
+
+        if (hour < 6 || hour > 20) {
+            normalized = Math.max(0, normalized * 0.1);
+        }
+
+        return Math.min(1200, normalized);
+    },
+
+    clearCache() {
+        if (this.mockDataCache) {
+            this.mockDataCache.clear();
+        }
     }
 };
+
+ChartUtils.mockDataCache = new Map();
 
 window.ChartUtils = ChartUtils;
