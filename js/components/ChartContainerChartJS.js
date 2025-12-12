@@ -17,7 +17,7 @@ const ChartContainerChartJS = () => {
         { id: 'temperature', label: 'Температура воздуха, °C', color: '#FF6B6B', gradient: ['#FF6B6B', '#FF8E8E'], unit: '°C' },
         { id: 'humidity', label: 'Относительная влажность, %', color: '#4ECDC4', gradient: ['#4ECDC4', '#6ED9D2'], unit: '%' },
         { id: 'pressure', label: 'Атмосферное давление, гПа', color: '#45B7D1', gradient: ['#45B7D1', '#65C7E1'], unit: 'гПа' },
-        { id: 'insolation', label: 'Уровень освещенности, лк', color: '#FFD166', gradient: ['#FFD166', '#FFDF99'], unit: 'лк' }
+        { id: 'insolation', label: 'Коэффициент солнечной инсоляции, Вт/м²', color: '#FFD166', gradient: ['#FFD166', '#FFDF99'], unit: 'Вт/м²' }
     ], []);
 
     React.useEffect(() => {
@@ -212,7 +212,7 @@ const ChartContainerChartJS = () => {
             temperature: { min: 15, max: 25, daily: true },
             humidity: { min: 50, max: 80, daily: true },
             pressure: { min: 1005, max: 1025, daily: false },
-            insolation: { min: 1000, max: 7000, daily: true }
+            insolation: { min: 100, max: 800, daily: true }
         };
 
         const config = baseValues[type] || baseValues.temperature;
@@ -228,7 +228,7 @@ const ChartContainerChartJS = () => {
 
                 if (type === 'insolation') {
                     if (hour < 6 || hour > 20) {
-                        value = config.min * 0.1;
+                        value = Math.max(0, config.min * 0.1);
                     } else if (hour >= 10 && hour <= 16) {
                         value = config.max * 0.9 + (config.max * 0.2 * Math.random());
                     }
@@ -256,7 +256,7 @@ const ChartContainerChartJS = () => {
                     value = Math.max(980, Math.min(1040, value));
                     break;
                 case 'insolation':
-                    value = Math.max(0, Math.min(10000, value));
+                    value = Math.max(0, Math.min(1200, value));
                     break;
             }
 
@@ -360,7 +360,12 @@ const ChartContainerChartJS = () => {
                         cornerRadius: 8,
                         displayColors: false,
                         callbacks: {
-                            label: (context) => `${context.parsed.y.toFixed(1)} ${chartType.unit}`,
+                            label: (context) => {
+                                if (chartType.id === 'insolation') {
+                                    return `${context.parsed.y.toFixed(0)} Вт/м²`;
+                                }
+                                return `${context.parsed.y.toFixed(1)} ${chartType.unit}`;
+                            },
                             title: (context) => {
                                 const label = context[0].label;
                                 if (timeInterval === 'hours' && chartData.timestamps && chartData.timestamps[context[0].dataIndex]) {
@@ -487,7 +492,7 @@ const ChartContainerChartJS = () => {
             case 'hours': return 'Почасовой';
             case 'days': return 'Дневной';
             case 'months': return 'Месячный';
-            default: return 'Авто';
+            default: return timeInterval;
         }
     };
 
@@ -519,7 +524,6 @@ const ChartContainerChartJS = () => {
                 ),
 
                 DomUtils.createElement('div', { className: 'data-actions' },
-                    // Десктопные кнопки
                     !useDemoData && DomUtils.createElement('button', {
                         className: 'action-btn test-connection-btn desktop-btn',
                         onClick: testThingSpeakConnection,
@@ -540,7 +544,6 @@ const ChartContainerChartJS = () => {
                         'Обновить'
                     ),
 
-                    // Мобильные кнопки (иконки)
                     DomUtils.createElement('div', { className: 'mobile-actions' },
                         !useDemoData && DomUtils.createElement('button', {
                             className: 'mobile-action-btn test-btn',
@@ -595,8 +598,7 @@ const ChartContainerChartJS = () => {
                 },
                     DomUtils.createElement('option', { value: 'hours' }, '⏰ По часам'),
                     DomUtils.createElement('option', { value: 'days' }, '📅 По дням'),
-                    DomUtils.createElement('option', { value: 'months' }, '📆 По месяцам'),
-                    DomUtils.createElement('option', { value: 'auto' }, '🔄 Авто')
+                    DomUtils.createElement('option', { value: 'months' }, '📆 По месяцам')
                 )
             ),
 
