@@ -3,9 +3,6 @@
     border-radius: var(--radius-xl);
     overflow: hidden;
     position: relative;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    transition: background-color var(--transition-base), border-color var(--transition-base);
 }
 
 .carousel__track {
@@ -16,7 +13,7 @@
 
 .carousel__item {
     flex: 0 0 100%;
-    background: var(--bg-card);
+    background: #ffffff;
     border-radius: var(--radius-xl);
     padding: var(--space-6);
     text-align: center;
@@ -27,7 +24,7 @@
     justify-content: center;
     margin: 0 var(--space-3);
     box-shadow: var(--shadow-md);
-    border: 1px solid var(--border-color);
+    border: 1px solid #dee2e6;
     transition: all var(--transition-base);
     animation: slideInLeft var(--transition-base);
 }
@@ -65,12 +62,12 @@
     font-size: var(--text-lg);
     margin-bottom: var(--space-3);
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--primary);
 }
 
 .carousel__role {
     font-size: var(--text-sm);
-    color: var(--text-secondary);
+    color: #6c757d;
     line-height: 1.5;
     font-weight: 400;
     max-width: 20rem;
