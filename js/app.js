@@ -1,22 +1,15 @@
 const App = () => {
-    const scrollToSection = React.useCallback((sectionId) => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }, []);
-
     return React.createElement('div', { className: 'app' },
         React.createElement(window.Header),
         React.createElement('main', { className: 'app__main' },
             React.createElement('div', { className: 'container' },
-                React.createElement('button', {
+                React.createElement('a', {
                     className: 'btn btn--primary btn--full mb-4',
-                    onClick: () => scrollToSection('graphics')
+                    href: '#graphics'
                 }, 'К графикам'),
-                React.createElement('button', {
+                React.createElement('a', {
                     className: 'btn btn--secondary btn--full mb-6',
-                    onClick: () => scrollToSection('team')
+                    href: '#team'
                 }, 'О нас'),
                 React.createElement('hr', { className: 'divider' }),
                 React.createElement('section', { id: 'graphics' },
