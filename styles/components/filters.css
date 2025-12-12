@@ -1,10 +1,10 @@
 /* ==================== ОСНОВНОЙ БЛОК ФИЛЬТРОВ ==================== */
 .filters {
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: var(--radius-lg);
     padding: var(--space-5);
     margin-bottom: var(--space-6);
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--border-color);
     box-shadow: var(--shadow-md);
     transition: all var(--transition-base);
     animation: fadeIn 0.5s var(--transition-base) both;
@@ -25,12 +25,12 @@
 
 .filters__quick-btn {
     padding: var(--space-3) var(--space-4);
-    border: 1px solid var(--primary);
+    border: 1px solid var(--text-secondary);
     background: transparent;
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all var(--transition-base);
-    color: var(--primary);
+    color: var(--text-secondary);
     font-size: var(--text-sm);
     font-weight: 500;
     flex: 1;
@@ -100,12 +100,12 @@
 .filters__info {
     text-align: center;
     font-size: var(--text-sm);
-    color: #6c757d;
+    color: var(--text-muted);
     font-style: italic;
     padding: var(--space-3);
-    background: #f8f9fa;
+    background: var(--bg-secondary);
     border-radius: var(--radius-sm);
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--border-color);
 }
 
 /* ==================== АДАПТИВНОСТЬ ==================== */
